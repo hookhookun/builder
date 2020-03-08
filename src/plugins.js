@@ -18,7 +18,5 @@ exports.commonjs = () => {
     } catch {}
     return require('@rollup/plugin-commonjs')({namedExports});
 };
-exports.replace = (developMode) => require('@rollup/plugin-replace')({
-    'process.env.NODE_ENV': developMode ? '\'\'' : '\'production\'',
-});
+exports.replace = (replacements = {}) => require('@rollup/plugin-replace')(replacements);
 exports.terser = () => require('rollup-plugin-terser').terser();
