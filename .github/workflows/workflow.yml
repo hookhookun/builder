@@ -49,5 +49,6 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm run build
       - run: npm publish
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         if: contains(github.ref, 'tags/v')
-        env: {NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}}
