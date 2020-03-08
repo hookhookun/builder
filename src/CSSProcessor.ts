@@ -2,23 +2,30 @@ import * as postcss from 'postcss';
 import * as selectorParser from 'postcss-selector-parser';
 import {createIdentifier} from './createIdentifier';
 import {parseCSS} from './parseCSS';
+import {getIndent} from './getIndent';
+
+export type ClassNameMapping = Map<string, string>;
+export interface CSSProcessorResult {
+    root: postcss.Root,
+    map: ClassNameMapping,
+}
 
 export class CSSProcessor {
 
-    private readonly roots: Map<string, postcss.Root>;
+    public readonly promises: Map<string, Promise<CSSProcessorResult>>;
 
     private readonly identify: ReturnType<typeof createIdentifier>;
 
     public constructor() {
-        this.roots = new Map();
+        this.promises = new Map();
         this.identify = createIdentifier();
     }
 
-    public async process(
+    private async $process(
         cssFilePath: string,
-    ): Promise<string> {
+    ): Promise<CSSProcessorResult> {
         const root = await parseCSS(cssFilePath);
-        const classNameMapping: {[name: string]: string} = {};
+        const map: ClassNameMapping = new Map();
         const processor = selectorParser();
         root.walkRules((rule) => {
             const selector = processor.astSync(rule.selector);
@@ -27,18 +34,50 @@ export class CSSProcessor {
                     const {value: originalName} = className;
                     const classId = this.identify(`${cssFilePath}-${originalName}`);
                     const newName = `${originalName}-${classId}`;
-                    classNameMapping[originalName] = newName;
+                    map.set(originalName, newName);
                     className.replaceWith(selectorParser.className({value: newName}));
                 }
             });
             rule.selector = `${selector}`;
         });
-        this.roots.set(cssFilePath, root);
-        return `export default ${JSON.stringify(classNameMapping, null, 4)};`;
+        return {root, map};
     }
 
-    public concatenate(): string {
-        return [...this.roots.values()].join('\n');
+    public async process(
+        cssFilePath: string,
+        noCache = false,
+    ): Promise<CSSProcessorResult> {
+        let promise = this.promises.get(cssFilePath);
+        if (!promise || noCache) {
+            promise = this.$process(cssFilePath);
+            this.promises.set(cssFilePath, promise);
+        }
+        return await promise;
+    }
+
+    public async generateScript(
+        cssFilePath: string,
+        options: {
+            exportName?: string,
+            indent: number | string,
+        } = {indent: 4},
+    ): Promise<string> {
+        const {map} = await this.process(cssFilePath);
+        const indent = getIndent(options.indent);
+        const lines: Array<string> = [
+            `export ${options.exportName ? `const ${options.exportName} =` : 'default'} {`,
+        ];
+        for (const [from, to] of map) {
+            lines.push(`${indent}'${from}': '${to}',`);
+        }
+        lines.push('};');
+        return lines.join('\n');
+    }
+
+    public async concatenate(): Promise<string> {
+        return (await Promise.all([...this.promises.values()]))
+        .map(({root}) => `${root}`)
+        .join('\n');
     }
 
 }

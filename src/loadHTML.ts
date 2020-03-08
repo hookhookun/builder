@@ -2,15 +2,17 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as rollup from 'rollup';
 import * as cheerio from 'cheerio';
-import {CSSProcessor} from './CSSProcessor';
+import {CSSProcessor, ClassNameMapping} from './CSSProcessor';
 import {HTMLProcessor} from './HTMLProcessor';
 import {relativeURL} from './relativeURL';
 
-const emitCSS = (
-    context: rollup.PluginContext,
-    cssProcessor: CSSProcessor,
+const emitCSS = async (
+    {context, cssProcessor}: {
+        context: rollup.PluginContext,
+        cssProcessor: CSSProcessor,
+    },
 ) => {
-    const css = cssProcessor.concatenate();
+    const css = await cssProcessor.concatenate();
     const referenceId = context.emitFile({
         type: 'asset',
         source: css,
@@ -82,10 +84,28 @@ export const loadHTML = (
         name: 'LoadHTML',
         async load(id) {
             switch (path.extname(id)) {
-                case '.html':
-                    return await htmlProcessor.process(id);
+                case '.html': {
+                    const {$, dependencies} = await htmlProcessor.process(id);
+                    const directory = path.dirname(id);
+                    const classNames: ClassNameMapping = new Map();
+                    await Promise.all(dependencies.map(async (dependency) => {
+                        if (path.extname(dependency) === '.css') {
+                            const cssFilePath = path.join(directory, dependency);
+                            const {map} = await cssProcessor.process(cssFilePath);
+                            for (const [key, value] of map) {
+                                classNames.set(key, value);
+                            }
+                        }
+                    }));
+                    for (const {attribs} of $('[class]').toArray()) {
+                        attribs.class = attribs.class.trim().split(/\s+/)
+                        .map((name) => classNames.get(name) || name)
+                        .join(' ');
+                    }
+                    return await htmlProcessor.generateScript(id);
+                }
                 case '.css':
-                    return await cssProcessor.process(id);
+                    return await cssProcessor.generateScript(id);
                 default:
                     return null;
             }
@@ -99,14 +119,14 @@ export const loadHTML = (
             };
         },
         async generateBundle(_options, bundle) {
-            const cssFileName = emitCSS(this, cssProcessor);
+            const cssFileName = await emitCSS({context: this, cssProcessor});
             await Promise.all(Object.values(bundle).map(async (chunk) => {
                 if (chunk.type !== 'chunk' || !chunk.facadeModuleId) {
                     return;
                 }
-                let $ = htmlProcessor.documents.get(chunk.facadeModuleId);
-                if ($) {
-                    $ = cheerio.load($.html());
+                let promise = htmlProcessor.promises.get(chunk.facadeModuleId);
+                if (promise) {
+                    const $ = cheerio.load((await promise).$.html());
                     const directory = path.dirname(chunk.facadeModuleId);
                     const pathToRoot = path.relative(directory, props.baseDir);
                     await replaceReferences({
@@ -128,6 +148,10 @@ export const loadHTML = (
                     });
                 }
             }));
+        },
+        watchChange(id) {
+            htmlProcessor.promises.delete(id);
+            cssProcessor.promises.delete(id);
         },
     };
 };
