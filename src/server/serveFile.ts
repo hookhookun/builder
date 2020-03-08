@@ -19,25 +19,16 @@ export const serveFile = async (
     }
     const {filePath, stats} = await findFile(path.join(props.documentRoot, req.url));
     const contentType = getContentType(filePath);
-    const promise = new Promise((resolve, reject) => {
-        res
-        .once('error', reject)
-        .once('finish', resolve);
-    });
     const headers = {
         'content-type': contentType,
         'content-length': stats.size,
     };
+    let source: stream.Readable = fs.createReadStream(filePath);
     if (contentType.startsWith('text/html')) {
-        const snippet = Buffer.from([
-            '<script>',
-            await getReloadScript(props.eventSourceEndpoint),
-            '</script>',
-        ].join(''));
+        const reloadScript = await getReloadScript(props.eventSourceEndpoint);
+        const snippet = Buffer.from(`\n<script>\n${reloadScript}\n</script>`);
         headers['content-length'] += snippet.length;
-        res.writeHead(200, headers);
-        fs.createReadStream(filePath)
-        .pipe(new stream.Transform({
+        source = source.pipe(new stream.Transform({
             transform(chunk, _encoding, callback) {
                 this.push(chunk);
                 callback();
@@ -46,11 +37,12 @@ export const serveFile = async (
                 this.push(snippet);
                 callback();
             },
-        }))
-        .pipe(res);
-    } else {
-        res.writeHead(200, headers);
-        fs.createReadStream(filePath).pipe(res);
+        }));
     }
+    const promise = new Promise((resolve, reject) => {
+        res.once('error', reject).once('finish', resolve);
+    });
+    res.writeHead(200, headers);
+    source.pipe(res);
     await promise;
 };
