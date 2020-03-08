@@ -18,7 +18,8 @@
     "files": [
         "lib",
         "files",
-        "@types"
+        "@types",
+        "tsconfig.base.json"
     ],
     "dependencies": {
         "@rollup/plugin-commonjs": "^11.0.2",
