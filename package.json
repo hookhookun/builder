@@ -8,7 +8,9 @@
     "scripts": {
         "build": "tsc",
         "test": "run-s test:*",
-        "test:type": "tsc --noEmit"
+        "test:type": "tsc --noEmit",
+        "test:build": "ts-node src --src sample-src --dest sample-dest",
+        "start": "ts-node src --src sample-src --dest sample-dest --watch"
     },
     "bin": {
         "build-page": "lib/index.js"
@@ -26,7 +28,6 @@
         "cssnano": "^4.1.10",
         "fast-glob": "^3.2.2",
         "magic-string": "^0.25.7",
-        "npm-run-all": "^4.1.5",
         "postcss": "^7.0.27",
         "postcss-selector-parser": "^6.0.2",
         "rollup": "^2.0.2",
@@ -40,6 +41,7 @@
         "@types/react": "^16.9.23",
         "@types/react-dom": "^16.9.5",
         "@types/react-redux": "^7.1.7",
+        "npm-run-all": "^4.1.5",
         "ts-node": "^8.6.2",
         "typescript": "^3.8.3"
     }
