@@ -1,0 +1,39 @@
+{
+    "name": "@hookun/builder",
+    "version": "0.0.0",
+    "license": "Apache-2.0",
+    "scripts": {
+        "build": "tsc",
+        "test": "run-s test:*",
+        "test:type": "tsc"
+    },
+    "bin": {
+        "build-page": "lib/index.js"
+    },
+    "dependencies": {
+        "@rollup/plugin-commonjs": "^11.0.2",
+        "@rollup/plugin-node-resolve": "^7.1.1",
+        "@rollup/plugin-replace": "^2.3.1",
+        "@rollup/plugin-sucrase": "^3.0.0",
+        "cheerio": "^1.0.0-rc.3",
+        "cssnano": "^4.1.10",
+        "fast-glob": "^3.2.2",
+        "magic-string": "^0.25.7",
+        "npm-run-all": "^4.1.5",
+        "postcss": "^7.0.27",
+        "postcss-selector-parser": "^6.0.2",
+        "rollup": "^2.0.2",
+        "rollup-plugin-terser": "^5.2.0",
+        "rollup-pluginutils": "^2.8.2"
+    },
+    "devDependencies": {
+        "@types/cheerio": "^0.22.16",
+        "@types/cssnano": "^4.0.0",
+        "@types/node": "^13.9.0",
+        "@types/react": "^16.9.23",
+        "@types/react-dom": "^16.9.5",
+        "@types/react-redux": "^7.1.7",
+        "ts-node": "^8.6.2",
+        "typescript": "^3.8.3"
+    }
+}
