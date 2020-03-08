@@ -75,10 +75,11 @@ const replaceReferences = async (
 
 export const loadHTML = (
     props: {
+        production: boolean,
         baseDir: string,
     },
 ): rollup.Plugin => {
-    const cssProcessor = new CSSProcessor();
+    const cssProcessor = new CSSProcessor({minify: props.production});
     const htmlProcessor = new HTMLProcessor();
     return {
         name: 'LoadHTML',

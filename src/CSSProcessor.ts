@@ -12,13 +12,25 @@ export interface CSSProcessorResult {
 
 export class CSSProcessor {
 
+    public readonly minify: boolean;
+
     public readonly promises: Map<string, Promise<CSSProcessorResult>>;
 
     private readonly identify: ReturnType<typeof createIdentifier>;
 
-    public constructor() {
+
+    public constructor(options: {minify?: boolean}) {
+        this.minify = Boolean(options.minify);
         this.promises = new Map();
         this.identify = createIdentifier();
+    }
+
+    private getName(
+        name: string,
+        id: number,
+    ): string {
+        const suffix = id.toString(34);
+        return this.minify ? `_${suffix}` : `${name}_${suffix}`;
     }
 
     private async $process(
@@ -32,8 +44,8 @@ export class CSSProcessor {
             selector.walkClasses((className) => {
                 if (className.type === 'class') {
                     const {value: originalName} = className;
-                    const classId = this.identify(`${cssFilePath}-${originalName}`);
-                    const newName = `${originalName}-${classId}`;
+                    const id = this.identify(`${cssFilePath} ${originalName}`);
+                    const newName = this.getName(originalName, id);
                     map.set(originalName, newName);
                     className.replaceWith(selectorParser.className({value: newName}));
                 }
