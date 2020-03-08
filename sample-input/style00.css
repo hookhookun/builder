@@ -4,6 +4,6 @@ a::before {
 footer a::before {
     content: '';
 }
-li[data-style=Style00]::after {
+.Style00::after {
     content: 'Applied!';
 }
