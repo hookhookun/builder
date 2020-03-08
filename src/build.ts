@@ -28,7 +28,7 @@ export const build = async (options: BuildOptions) => {
     }
     const input = await glob(path.join(options.src, '**/*.html'));
     const inputOptions: rollup.InputOptions = {input, plugins};
-    const format = 'es';
+    const format = 'system';
     await remove(options.dest);
     if (options.watch) {
         await watch(inputOptions, {format, dir: options.dest});

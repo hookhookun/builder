@@ -32,7 +32,8 @@
         "postcss-selector-parser": "^6.0.2",
         "rollup": "^2.0.2",
         "rollup-plugin-terser": "^5.2.0",
-        "rollup-pluginutils": "^2.8.2"
+        "rollup-pluginutils": "^2.8.2",
+        "systemjs": "^6.2.5"
     },
     "devDependencies": {
         "@types/cheerio": "^0.22.16",

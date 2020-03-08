@@ -139,12 +139,17 @@ export const loadHTML = (
             };
         },
         async generateBundle(_options, bundle) {
-            const [cssFileName, faviconFileName] = await Promise.all([
+            const [cssFile, faviconFile, systemjsFile] = await Promise.all([
                 emitCSS({context: this, cssProcessor}),
                 emitAssetFromFile({
                     context: this,
                     name: 'favicon.png',
                     file: path.join(assetDirectory, 'favicon.png'),
+                }),
+                emitAssetFromFile({
+                    context: this,
+                    name: 'system.js',
+                    file: require.resolve('systemjs/dist/s.min.js'),
                 }),
             ]);
             await Promise.all(Object.values(bundle).map(async (chunk) => {
@@ -168,12 +173,13 @@ export const loadHTML = (
                         ($head.html() || '').trim(),
                     ];
                     if ($head.find('link[rel=favicon]').length === 0) {
-                        parts.push(`<link rel="icon" type="image/png" href="${relativeURL(pathToRoot, faviconFileName)}">`);
+                        parts.push(`<link rel="icon" type="image/png" href="${relativeURL(pathToRoot, faviconFile)}">`);
                     }
                     parts.push(
-                        `<link rel="stylesheet" href="${relativeURL(pathToRoot, cssFileName)}">`,
+                        `<link rel="stylesheet" href="${relativeURL(pathToRoot, cssFile)}">`,
                         ($('body').html() || '').trim(),
-                        `<script src="${relativeURL(pathToRoot, chunk.fileName)}" defer></script>`,
+                        `<script src="${relativeURL(pathToRoot, systemjsFile)}"></script>`,
+                        `<script>System.import('${relativeURL(pathToRoot, chunk.fileName)}')</script>`,
                     );
                     this.emitFile({
                         type: 'asset',
