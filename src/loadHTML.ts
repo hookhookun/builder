@@ -25,7 +25,10 @@ const copyReferencedFiles = async (
     directory: string,
 ) => {
     await Promise.all(['href', 'src'].map(async (attr) => {
-        await Promise.all($(`[${attr}^="."]`).toArray().map(async ({attribs}) => {
+        await Promise.all($(`[${attr}^="."]`).toArray().map(async ({attribs, tagName}) => {
+            if (tagName === 'a') {
+                return;
+            }
             const relativePath = attribs[attr];
             const filePath = path.join(directory, relativePath);
             const source = await fs.promises.readFile(filePath)
