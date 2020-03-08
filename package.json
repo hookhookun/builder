@@ -10,6 +10,10 @@
     "bin": {
         "build-page": "lib/index.js"
     },
+    "files": [
+        "lib",
+        "@types"
+    ],
     "dependencies": {
         "@rollup/plugin-commonjs": "^11.0.2",
         "@rollup/plugin-node-resolve": "^7.1.1",
