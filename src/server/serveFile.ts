@@ -4,7 +4,6 @@ import * as fs from 'fs';
 import * as stream from 'stream';
 import {getContentType} from './getContentType';
 import {getReloadScript} from './getReloadScript';
-import {findFile} from './findFile';
 
 export const serveFile = async (
     req: http.IncomingMessage,
@@ -17,7 +16,13 @@ export const serveFile = async (
     if (!req.url) {
         throw new Error(`NoURL: req.url is ${req.url}`);
     }
-    const {filePath, stats} = await findFile(path.join(props.documentRoot, req.url));
+    const filePath = path.join(props.documentRoot, req.url.replace(/\/$/, '/index.html'));
+    const stats = await fs.promises.stat(filePath);
+    if (stats.isDirectory()) {
+        res.writeHead(301, {location: `${req.url}/`});
+        res.end();
+        return;
+    }
     const contentType = getContentType(filePath);
     const headers = {
         'content-type': contentType,
