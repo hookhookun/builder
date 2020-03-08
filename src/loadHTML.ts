@@ -93,9 +93,9 @@ export const loadHTML = (
                     type: 'asset',
                     source: [
                         '<!doctype html>',
-                        $('head').html(),
+                        ($('head').html() || '').trim(),
                         `<link rel="stylesheet" href="./${cssFileName}">`,
-                        $('body').html(),
+                        ($('body').html() || '').trim(),
                         `<script src="./${chunk.fileName}" defer></script>`,
                     ].join('\n'),
                     fileName: path.relative(props.baseDir, chunk.facadeModuleId),
