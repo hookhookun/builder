@@ -22,6 +22,10 @@ export class HTMLProcessor {
                 lines.push(`import '${src}';`);
             }
         }
+        const localStyleSheets = $('link[href^="."][rel="stylesheet"]').remove();
+        for (const {attribs: {href}} of localStyleSheets.toArray()) {
+            lines.push(`import '${href}';`);
+        }
         return lines.join('\n');
     }
 
