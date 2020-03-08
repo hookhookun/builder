@@ -6,12 +6,27 @@ import {CSSProcessor, ClassNameMapping} from './CSSProcessor';
 import {HTMLProcessor} from './HTMLProcessor';
 import {relativeURL} from './relativeURL';
 
+const emitAssetFromFile = async (
+    {context, name, file}: {
+        context: rollup.PluginContext,
+        name: string,
+        file: string,
+    },
+): Promise<string> => {
+    const referenceId = context.emitFile({
+        type: 'asset',
+        name,
+        source: await fs.promises.readFile(file),
+    });
+    return context.getFileName(referenceId);
+};
+
 const emitCSS = async (
     {context, cssProcessor}: {
         context: rollup.PluginContext,
         cssProcessor: CSSProcessor,
     },
-) => {
+): Promise<string> => {
     const css = await cssProcessor.concatenate();
     const referenceId = context.emitFile({
         type: 'asset',
@@ -35,7 +50,7 @@ const replaceReference = async (
         element: CheerioElement,
         attribute: string,
     },
-) => {
+): Promise<void> => {
     if (tagName === 'a') {
         return;
     }
@@ -79,10 +94,14 @@ export const loadHTML = (
         baseDir: string,
     },
 ): rollup.Plugin => {
+    const assetDirectory = path.join(__dirname, '../files');
     const cssProcessor = new CSSProcessor({minify: props.production});
     const htmlProcessor = new HTMLProcessor();
     return {
         name: 'LoadHTML',
+        async buildStart() {
+            await cssProcessor.process(path.join(assetDirectory, 'base.css'));
+        },
         async load(id) {
             switch (path.extname(id)) {
                 case '.html': {
@@ -120,7 +139,14 @@ export const loadHTML = (
             };
         },
         async generateBundle(_options, bundle) {
-            const cssFileName = await emitCSS({context: this, cssProcessor});
+            const [cssFileName, faviconFileName] = await Promise.all([
+                emitCSS({context: this, cssProcessor}),
+                emitAssetFromFile({
+                    context: this,
+                    name: 'favicon.png',
+                    file: path.join(assetDirectory, 'favicon.png'),
+                }),
+            ]);
             await Promise.all(Object.values(bundle).map(async (chunk) => {
                 if (chunk.type !== 'chunk' || !chunk.facadeModuleId) {
                     return;
@@ -136,15 +162,22 @@ export const loadHTML = (
                         pathToRoot,
                         directory,
                     });
+                    const $head = $('head');
+                    const parts = [
+                        '<!doctype html>',
+                        ($head.html() || '').trim(),
+                    ];
+                    if ($head.find('link[rel=favicon]').length === 0) {
+                        parts.push(`<link rel="icon" type="image/png" href="${relativeURL(pathToRoot, faviconFileName)}">`);
+                    }
+                    parts.push(
+                        `<link rel="stylesheet" href="${relativeURL(pathToRoot, cssFileName)}">`,
+                        ($('body').html() || '').trim(),
+                        `<script src="${relativeURL(pathToRoot, chunk.fileName)}" defer></script>`,
+                    );
                     this.emitFile({
                         type: 'asset',
-                        source: [
-                            '<!doctype html>',
-                            ($('head').html() || '').trim(),
-                            `<link rel="stylesheet" href="${relativeURL(pathToRoot, cssFileName)}">`,
-                            ($('body').html() || '').trim(),
-                            `<script src="${relativeURL(pathToRoot, chunk.fileName)}" defer></script>`,
-                        ].join('\n'),
+                        source: parts.join('\n'),
                         fileName: path.relative(props.baseDir, chunk.facadeModuleId),
                     });
                 }
