@@ -1,3 +1,19 @@
-.Style01::after {
+:root {
+    --Width: 92vw;
+    --MaxWidth: 720px;
+}
+
+body>* {
+    width: var(--Width);
+    max-width: var(--MaxWidth);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.Links a::before {
+    content: attr(href);
+}
+
+.Style1::after {
     content: 'Applied!';
 }

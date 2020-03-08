@@ -1,9 +1,0 @@
-a::before {
-    content: attr(href);
-}
-footer a::before {
-    content: '';
-}
-.Style00::after {
-    content: 'Applied!';
-}

@@ -1,17 +1,13 @@
 <!doctype html>
 <meta charset="utf-8">
 <title>@hookun/builder</title>
-<style>
-    .StyleTest::before{content:attr(data-style)': '}
-    .StyleTest::after{content:'Not applied'}
-</style>
-<link rel="stylesheet" href="../style00.css">
+<style>.StyleTest::after{content:'Not applied'}</style>
 <link rel="stylesheet" href="../style01.css">
+<link rel="stylesheet" href="../style02.css">
 <script src="../script01.ts"></script>
 <main>
-    <h1>Absolute Links</h1>
-    <ul>
-        <li><a href="/"></a></li>
+    <h1>Links</h1>
+    <ul class="Links">
         <li><a href="/index.html"></a></li>
         <li><a href="/page.html"></a></li>
         <li><a href="/subdirectory"></a></li>
@@ -19,20 +15,11 @@
         <li><a href="/subdirectory/index.html"></a></li>
         <li><a href="/subdirectory/page.html"></a></li>
     </ul>
-    <h1>Relative Links</h1>
-    <ul>
-        <li><a href=".."></a></li>
-        <li><a href="../index.html"></a></li>
-        <li><a href="../page.html"></a></li>
-        <li><a href="."></a></li>
-        <li><a href="./index.html"></a></li>
-        <li><a href="./page.html"></a></li>
-    </ul>
     <h1>Applied Styles</h1>
     <ul>
-        <li class="StyleTest Style00"></li>
-        <li class="StyleTest Style01"></li>
-        <li class="StyleTest Style02"></li>
+        <li class="StyleTest Style1">Style1: </li>
+        <li class="StyleTest Style2">Style2: </li>
+        <li class="StyleTest Style3">Style3: </li>
     </ul>
 </main>
 <script src="../script03.ts"></script>
