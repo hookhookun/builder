@@ -15,6 +15,7 @@ export interface BuildOptions {
 }
 
 export const build = async (options: BuildOptions) => {
+    console.log(options);
     const plugins = [
         replace(options.watch),
         loadHTML({baseDir: options.src}),
