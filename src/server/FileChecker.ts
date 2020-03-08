@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import * as fg from 'fast-glob';
-import {forwardSlash} from '../forwardSlash';
+import {glob} from '../glob';
 
 export type FileState = 'add' | 'change' | '';
 export type FileStateFilter = (
@@ -42,7 +41,7 @@ export class FileChecker {
         directory: string,
         filter = this.filter,
     ): Promise<Map<string, string>> {
-        const files = await fg(forwardSlash(path.join(directory, '**/*')));
+        const files = await glob(path.join(directory, '**/*'));
         const states = await Promise.all(files.map(async (file) => this.checkFile(file)));
         return states.reduce(
             (result, state, index) => {

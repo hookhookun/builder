@@ -9,7 +9,7 @@
         "build": "tsc",
         "test": "run-s test:*",
         "test:type": "tsc --noEmit",
-        "test:build": "ts-node src --src sample-src --dest sample-dest",
+        "test:build": "ts-node src --src sample-input --dest sample-output",
         "start": "ts-node src --src sample-input --dest sample-output --watch"
     },
     "bin": {

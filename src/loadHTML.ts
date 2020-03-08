@@ -4,7 +4,7 @@ import * as rollup from 'rollup';
 import * as cheerio from 'cheerio';
 import {CSSProcessor} from './CSSProcessor';
 import {HTMLProcessor} from './HTMLProcessor';
-import {forwardSlash} from './forwardSlash';
+import {relativeURL} from './relativeURL';
 
 const emitCSS = (
     context: rollup.PluginContext,
@@ -19,33 +19,54 @@ const emitCSS = (
     return context.getFileName(referenceId);
 };
 
-const copyReferencedFiles = async (
-    context: rollup.PluginContext,
-    $: CheerioStatic,
-    directory: string,
+const replaceReference = async (
+    {
+        context,
+        pathToRoot,
+        directory,
+        element: {tagName, attribs},
+        attribute,
+    }: {
+        context: rollup.PluginContext,
+        pathToRoot: string,
+        directory: string,
+        element: CheerioElement,
+        attribute: string,
+    },
 ) => {
-    await Promise.all(['href', 'src'].map(async (attr) => {
-        await Promise.all($(`[${attr}^="."]`).toArray().map(async ({attribs, tagName}) => {
-            if (tagName === 'a') {
-                return;
-            }
-            const relativePath = attribs[attr];
-            const filePath = path.join(directory, relativePath);
-            const source = await fs.promises.readFile(filePath)
-            .catch((error) => {
-                if (error.code === 'ENOENT') {
-                    return null;
-                }
-                throw error;
-            });
-            if (source) {
-                const newPath = context.getFileName(context.emitFile({
-                    type: 'asset',
-                    source,
-                    name: path.basename(relativePath),
-                }));
-                attribs[attr] = forwardSlash(path.relative(path.dirname(relativePath), newPath));
-            }
+    if (tagName === 'a') {
+        return;
+    }
+    const relativePath = attribs[attribute];
+    const filePath = path.join(directory, relativePath);
+    const source = await fs.promises.readFile(filePath).catch((error) => {
+        if (error.code === 'ENOENT') {
+            return null;
+        }
+        throw error;
+    });
+    if (source) {
+        const newPath = context.getFileName(context.emitFile({
+            type: 'asset',
+            source,
+            name: path.basename(relativePath),
+        }));
+        attribs[attribute] = relativeURL(pathToRoot, newPath);
+    }
+};
+
+const replaceReferences = async (
+    props: {
+        context: rollup.PluginContext,
+        $: CheerioStatic,
+        pathToRoot: string,
+        directory: string,
+    },
+) => {
+    await Promise.all(['href', 'src'].map(async (attribute) => {
+        await Promise.all(props.$(`[${attribute}^="."]`).toArray()
+        .map(async (element) => {
+            await replaceReference({...props, element, attribute});
         }));
     }));
 };
@@ -84,22 +105,28 @@ export const loadHTML = (
                     return;
                 }
                 let $ = htmlProcessor.documents.get(chunk.facadeModuleId);
-                if (!$) {
-                    return;
+                if ($) {
+                    $ = cheerio.load($.html());
+                    const directory = path.dirname(chunk.facadeModuleId);
+                    const pathToRoot = path.relative(directory, props.baseDir);
+                    await replaceReferences({
+                        context: this,
+                        $,
+                        pathToRoot,
+                        directory,
+                    });
+                    this.emitFile({
+                        type: 'asset',
+                        source: [
+                            '<!doctype html>',
+                            ($('head').html() || '').trim(),
+                            `<link rel="stylesheet" href="${relativeURL(pathToRoot, cssFileName)}">`,
+                            ($('body').html() || '').trim(),
+                            `<script src="${relativeURL(pathToRoot, chunk.fileName)}" defer></script>`,
+                        ].join('\n'),
+                        fileName: path.relative(props.baseDir, chunk.facadeModuleId),
+                    });
                 }
-                $ = cheerio.load($.html());
-                await copyReferencedFiles(this, $, path.dirname(chunk.facadeModuleId));
-                this.emitFile({
-                    type: 'asset',
-                    source: [
-                        '<!doctype html>',
-                        ($('head').html() || '').trim(),
-                        `<link rel="stylesheet" href="./${cssFileName}">`,
-                        ($('body').html() || '').trim(),
-                        `<script src="./${chunk.fileName}" defer></script>`,
-                    ].join('\n'),
-                    fileName: path.relative(props.baseDir, chunk.facadeModuleId),
-                });
             }));
         },
     };

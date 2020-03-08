@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as rollup from 'rollup';
 import {startServer} from './server';
 import {FileChecker} from './server/FileChecker';
-import {forwardSlash} from './forwardSlash';
+import {relativeURL} from './relativeURL';
 
 export const watch = async (
     inputOptions: rollup.InputOptions,
@@ -37,7 +37,7 @@ export const watch = async (
                     console.log(`${state}: ${file}`);
                     clientList.broadcast(
                         `event: ${state}\n`,
-                        `data: ${forwardSlash(path.relative(outputOptions.dir, file))}\n\n`,
+                        `data: ${relativeURL(path.relative(outputOptions.dir, file))}\n\n`,
                     );
                 }
             })

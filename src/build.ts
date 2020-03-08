@@ -1,12 +1,11 @@
 import * as path from 'path';
 import * as rollup from 'rollup';
-import * as fg from 'fast-glob';
 import {sucrase, nodeResolve, commonjs, replace, terser} from './plugins';
 import {loadHTML} from './loadHTML';
 import {removeSourceMapReference} from './removeSourceMapReference';
 import {remove} from './remove';
-import {forwardSlash} from './forwardSlash';
 import {watch} from './watch';
+import {glob} from './glob';
 
 export interface BuildOptions {
     src: string,
@@ -27,7 +26,7 @@ export const build = async (options: BuildOptions) => {
     if (!options.watch) {
         plugins.push(terser());
     }
-    const input = await fg(forwardSlash(path.join(options.src, '**/*.html')));
+    const input = await glob(path.join(options.src, '**/*.html'));
     const inputOptions: rollup.InputOptions = {input, plugins};
     const format = 'es';
     await remove(options.dest);
