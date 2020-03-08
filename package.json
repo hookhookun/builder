@@ -17,6 +17,7 @@
     },
     "files": [
         "lib",
+        "files",
         "@types"
     ],
     "dependencies": {
