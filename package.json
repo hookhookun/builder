@@ -5,7 +5,7 @@
     "scripts": {
         "build": "tsc",
         "test": "run-s test:*",
-        "test:type": "tsc"
+        "test:type": "tsc --noEmit"
     },
     "bin": {
         "build-page": "lib/index.js"
