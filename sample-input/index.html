@@ -1,0 +1,40 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>@hookun/builder index</title>
+<link rel="icon" type="image/png" href="./favicon.png">
+<link rel="stylesheet" href="./style00.css">
+<link rel="stylesheet" href="./style01.css">
+<script src="./script01.ts"></script>
+<main>
+    <h1>Absolute Links</h1>
+    <ul>
+        <li><a href="/"></a></li>
+        <li><a href="/index.html"></a></li>
+        <li><a href="/page.html"></a></li>
+        <li><a href="/subdirectory"></a></li>
+        <li><a href="/subdirectory/"></a></li>
+        <li><a href="/subdirectory/index.html"></a></li>
+        <li><a href="/subdirectory/page.html"></a></li>
+    </ul>
+    <h1>Relative Links</h1>
+    <ul>
+        <li><a href="."></a></li>
+        <li><a href="./index.html"></a></li>
+        <li><a href="./page.html"></a></li>
+        <li><a href="./subdirectory"></a></li>
+        <li><a href="./subdirectory/"></a></li>
+        <li><a href="./subdirectory/index.html"></a></li>
+        <li><a href="./subdirectory/page.html"></a></li>
+    </ul>
+    <h1>Applied Styles</h1>
+    <style>
+        [data-style]::before{content:attr(data-style)': '}
+        [data-style]::after{content:'Not applied'}
+    </style>
+    <ul class="StyleTest">
+        <li data-style="Style00"></li>
+        <li data-style="Style01"></li>
+        <li data-style="Style02"></li>
+    </ul>
+</main>
+<script src="./script02.ts"></script>

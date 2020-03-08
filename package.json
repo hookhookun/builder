@@ -10,7 +10,7 @@
         "test": "run-s test:*",
         "test:type": "tsc --noEmit",
         "test:build": "ts-node src --src sample-src --dest sample-dest",
-        "start": "ts-node src --src sample-src --dest sample-dest --watch"
+        "start": "ts-node src --src sample-input --dest sample-output --watch"
     },
     "bin": {
         "build-page": "lib/index.js"

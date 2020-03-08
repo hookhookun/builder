@@ -1,0 +1,9 @@
+a::before {
+    content: attr(href);
+}
+footer a::before {
+    content: '';
+}
+li[data-style=Style00]::after {
+    content: 'Applied!';
+}

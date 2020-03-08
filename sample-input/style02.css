@@ -1,0 +1,3 @@
+li[data-style=Style02]::after {
+    content: 'Applied!';
+}
