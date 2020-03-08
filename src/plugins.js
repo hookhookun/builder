@@ -5,13 +5,19 @@ exports.sucrase = () => require('@rollup/plugin-sucrase')({
 exports.nodeResolve = () => require('@rollup/plugin-node-resolve')({
     extensions: ['.js', '.ts'],
 });
-exports.commonjs = () => require('@rollup/plugin-commonjs')({
-    namedExports: {
-        [require.resolve('react')]: Object.keys(require('react')),
-        [require.resolve('react-dom')]: Object.keys(require('react-dom')),
-        [require.resolve('react-is')]: Object.keys(require('react-is')),
-    },
-});
+exports.commonjs = () => {
+    const namedExports = {};
+    try {
+        namedExports[require.resolve('react')] = Object.keys(require('react'));
+    } catch {}
+    try {
+        namedExports[require.resolve('react-dom')] = Object.keys(require('react-dom'));
+    } catch {}
+    try {
+        namedExports[require.resolve('react-is')] = Object.keys(require('react-is'));
+    } catch {}
+    return require('@rollup/plugin-commonjs')({namedExports});
+};
 exports.replace = (developMode) => require('@rollup/plugin-replace')({
     'process.env.NODE_ENV': developMode ? '\'\'' : '\'production\'',
 });
