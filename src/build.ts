@@ -8,15 +8,16 @@ import {remove} from './remove';
 import {forwardSlash} from './forwardSlash';
 import {watch} from './watch';
 
-export const build = async (
-    options: {
-        watch: boolean,
-    },
-) => {
-    const srcDirectory = path.join(__dirname, '../src');
+export interface BuildOptions {
+    src: string,
+    dest: string,
+    watch: boolean,
+}
+
+export const build = async (options: BuildOptions) => {
     const plugins = [
         replace(options.watch),
-        loadHTML({baseDir: srcDirectory}),
+        loadHTML({baseDir: options.src}),
         removeSourceMapReference({include: ['**/node_modules/typesafe-actions/**']}),
         nodeResolve(),
         commonjs(),
@@ -25,15 +26,14 @@ export const build = async (
     if (!options.watch) {
         plugins.push(terser());
     }
-    const input = await fg(forwardSlash(path.join(srcDirectory, '**/*.html')));
+    const input = await fg(forwardSlash(path.join(options.src, '**/*.html')));
     const inputOptions: rollup.InputOptions = {input, plugins};
-    const dest = path.join(__dirname, '../dist');
     const format = 'es';
-    await remove(dest);
+    await remove(options.dest);
     if (options.watch) {
-        await watch(inputOptions, {format, dir: dest});
+        await watch(inputOptions, {format, dir: options.dest});
     } else {
         const bundle = await rollup.rollup(inputOptions);
-        await bundle.write({format, dir: dest});
+        await bundle.write({format, dir: options.dest});
     }
 };
