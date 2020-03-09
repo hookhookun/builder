@@ -11,6 +11,7 @@ export interface BuildPageAssets {
     systemjs: string,
     polyfill: string,
     baseCSS: string,
+    header: string,
     footer: string,
     favicon: string,
 }
@@ -29,6 +30,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
         systemjs: require.resolve('systemjs/dist/s.min.js'),
         polyfill: path.join(__dirname, '../files/polyfill.js'),
         baseCSS: path.join(__dirname, '../files/base.css'),
+        header: path.join(__dirname, '../files/header.html'),
         footer: path.join(__dirname, '../files/footer.html'),
         favicon: path.join(__dirname, '../files/favicon.png'),
         ...props.assets,
@@ -64,7 +66,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
             };
         },
         async generateBundle(_options, bundle) {
-            const [systemjs, css, favicon, footer] = await Promise.all([
+            const [systemjs, css, favicon, header, footer] = await Promise.all([
                 emitFile({
                     context: this,
                     name: 'env.js',
@@ -76,6 +78,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
                     name: 'favicon.png',
                     file: assets.favicon,
                 }),
+                fs.promises.readFile(assets.header, 'utf8'),
                 fs.promises.readFile(assets.footer, 'utf8'),
             ]);
             await Promise.all(Object.values(bundle).map(async (chunk) => {
@@ -88,6 +91,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
                             htmlFilePath: chunk.facadeModuleId,
                             baseDir: props.baseDir,
                             files: {systemjs, js: chunk.fileName, css, favicon},
+                            header,
                             footer,
                         });
                     }

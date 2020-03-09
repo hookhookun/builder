@@ -5,11 +5,12 @@ import {relativeURL} from '../relativeURL';
 import {replaceReferenceAll} from '../replaceReference';
 
 export const emitHTML = async (
-    {context, $: $$, htmlFilePath, baseDir, footer, files}: {
+    {context, $: $$, htmlFilePath, baseDir, header, footer, files}: {
         context: rollup.PluginContext,
         $: CheerioStatic,
         htmlFilePath: string,
         baseDir: string,
+        header: string,
         footer: string,
         files: {
             systemjs: string,
@@ -25,7 +26,7 @@ export const emitHTML = async (
     await replaceReferenceAll({context, $, directory, pathToRoot});
     const $head = $('head');
     const parts = [
-        '<!doctype html>',
+        header,
         ($head.html() || '').trim(),
     ];
     if ($head.find('link[rel=favicon]').length === 0) {
