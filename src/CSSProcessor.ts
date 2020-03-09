@@ -3,6 +3,7 @@ import * as selectorParser from 'postcss-selector-parser';
 import {createIdentifier} from './createIdentifier';
 import {parseCSS} from './parseCSS';
 import {getIndent} from './getIndent';
+import {ensureArray} from './ensureArray';
 
 export type ClassNameMapping = Map<string, string>;
 export interface CSSProcessorResult {
@@ -57,29 +58,39 @@ export class CSSProcessor {
 
     public async process(
         cssFilePath: string,
-        noCache = false,
     ): Promise<CSSProcessorResult> {
         let promise = this.promises.get(cssFilePath);
-        if (!promise || noCache) {
+        if (!promise) {
             promise = this.$process(cssFilePath);
             this.promises.set(cssFilePath, promise);
         }
         return await promise;
     }
 
+    public async getMapping(cssFile: string | Array<string>): Promise<ClassNameMapping> {
+        const mapping: ClassNameMapping = new Map();
+        await Promise.all(ensureArray(cssFile).map(async (cssFile) => {
+            const {map} = await this.process(cssFile);
+            for (const [key, value] of map) {
+                mapping.set(key, value);
+            }
+        }));
+        return mapping;
+    }
+
     public async generateScript(
-        cssFilePath: string,
+        cssFilePath: string | Array<string>,
         options: {
             exportName?: string,
             indent: number | string,
         } = {indent: 4},
     ): Promise<string> {
-        const {map} = await this.process(cssFilePath);
+        const mapping = await this.getMapping(cssFilePath);
         const indent = getIndent(options.indent);
         const lines: Array<string> = [
             `export ${options.exportName ? `const ${options.exportName} =` : 'default'} {`,
         ];
-        for (const [from, to] of map) {
+        for (const [from, to] of mapping) {
             lines.push(`${indent}'${from}': '${to}',`);
         }
         lines.push('};');

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as rollup from 'rollup';
 import {sucrase, nodeResolve, commonjs, replace, terser} from './plugins';
-import {loadHTML} from './loadHTML';
+import {buildPage} from './buildPage';
 import {removeSourceMapReference} from './removeSourceMapReference';
 import {remove} from './remove';
 import {watch} from './watch';
@@ -17,7 +17,7 @@ export const build = async (options: BuildOptions) => {
     console.log(options);
     const plugins = [
         replace({'process.env.NODE_ENV': options.watch ? '\'\'' : '\'production\''}),
-        loadHTML({baseDir: options.src, production: !options.watch}),
+        buildPage({baseDir: options.src, production: !options.watch}),
         removeSourceMapReference({include: ['**/node_modules/typesafe-actions/**']}),
         nodeResolve(),
         commonjs(),
