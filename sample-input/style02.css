@@ -1,3 +1,3 @@
-.Style2::after {
+.StyleTest.Style2::after {
     content: 'Applied!';
 }

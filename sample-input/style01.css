@@ -14,6 +14,6 @@ body>* {
     content: attr(href);
 }
 
-.Style1::after {
+.StyleTest.Style1::after {
     content: 'Applied!';
 }
