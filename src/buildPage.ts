@@ -6,23 +6,33 @@ import {HTMLProcessor} from './HTMLProcessor';
 import {emitCSS} from './emitter/css';
 import {emitHTML} from './emitter/html';
 import {emitFile} from './emitter/file';
-const assets = {
-    systemjs: require.resolve('systemjs/dist/s.min.js'),
-    polyfill: path.join(__dirname, '../files/polyfill.js'),
-    baseCSS: path.join(__dirname, '../files/base.css'),
-    footer: path.join(__dirname, '../files/footer.html'),
-    favicon: path.join(__dirname, '../files/favicon.png'),
-};
+
+export interface BuildPageAssets {
+    systemjs: string,
+    polyfill: string,
+    baseCSS: string,
+    footer: string,
+    favicon: string,
+}
 
 export interface BuildPagePluginProps {
     production: boolean,
     baseDir: string,
+    assets?: Partial<BuildPageAssets>,
     debug?: boolean,
 }
 
 export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
     const cssProcessor = new CSSProcessor({minify: props.production});
     const htmlProcessor = new HTMLProcessor({cssProcessor});
+    const assets: BuildPageAssets = {
+        systemjs: require.resolve('systemjs/dist/s.min.js'),
+        polyfill: path.join(__dirname, '../files/polyfill.js'),
+        baseCSS: path.join(__dirname, '../files/base.css'),
+        footer: path.join(__dirname, '../files/footer.html'),
+        favicon: path.join(__dirname, '../files/favicon.png'),
+        ...props.assets,
+    };
     return {
         name: 'BuildPage',
         async buildStart() {
