@@ -11,13 +11,18 @@ export interface BuildOptions {
     src: string,
     dest: string,
     watch: boolean,
+    debug?: boolean,
 }
 
 export const build = async (options: BuildOptions) => {
     console.log(options);
     const plugins = [
         replace({'process.env.NODE_ENV': options.watch ? '\'\'' : '\'production\''}),
-        buildPage({baseDir: options.src, production: !options.watch}),
+        buildPage({
+            baseDir: options.src,
+            production: !options.watch,
+            debug: options.debug,
+        }),
         removeSourceMapReference({include: ['**/node_modules/typesafe-actions/**']}),
         nodeResolve(),
         commonjs(),

@@ -5,11 +5,12 @@ import {relativeURL} from '../relativeURL';
 import {replaceReferenceAll} from '../replaceReference';
 
 export const emitHTML = async (
-    {context, $: $$, htmlFilePath, baseDir, files}: {
+    {context, $: $$, htmlFilePath, baseDir, footer, files}: {
         context: rollup.PluginContext,
         $: CheerioStatic,
         htmlFilePath: string,
         baseDir: string,
+        footer: string,
         files: {
             systemjs: string,
             js: string,
@@ -33,6 +34,7 @@ export const emitHTML = async (
     parts.push(
         `<link rel="stylesheet" href="${relativeURL(pathToRoot, files.css)}">`,
         ($('body').html() || '').trim(),
+        footer,
         `<script src="${relativeURL(pathToRoot, files.systemjs)}"></script>`,
         `<script>System.import('${relativeURL(pathToRoot, files.js)}')</script>`,
     );

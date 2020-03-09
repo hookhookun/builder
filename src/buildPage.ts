@@ -1,25 +1,38 @@
 import * as path from 'path';
+import * as fs from 'fs';
 import * as rollup from 'rollup';
 import {CSSProcessor} from './CSSProcessor';
 import {HTMLProcessor} from './HTMLProcessor';
 import {emitCSS} from './emitter/css';
 import {emitHTML} from './emitter/html';
 import {emitFile} from './emitter/file';
+const assets = {
+    systemjs: require.resolve('systemjs/dist/s.min.js'),
+    polyfill: path.join(__dirname, '../files/polyfill.js'),
+    baseCSS: path.join(__dirname, '../files/base.css'),
+    footer: path.join(__dirname, '../files/footer.html'),
+    favicon: path.join(__dirname, '../files/favicon.png'),
+};
 
 export interface BuildPagePluginProps {
     production: boolean,
     baseDir: string,
+    debug?: boolean,
 }
 
 export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
-    const assetDirectory = path.join(__dirname, '../files');
     const cssProcessor = new CSSProcessor({minify: props.production});
     const htmlProcessor = new HTMLProcessor({cssProcessor});
     return {
         name: 'BuildPage',
         async buildStart() {
-            const baseCSSFilePath = path.join(assetDirectory, 'base.css');
-            await cssProcessor.process(baseCSSFilePath);
+            if (props.debug) {
+                this.addWatchFile(assets.baseCSS);
+                this.addWatchFile(assets.polyfill);
+                this.addWatchFile(assets.footer);
+                this.addWatchFile(assets.favicon);
+            }
+            await cssProcessor.process(assets.baseCSS);
         },
         async load(id) {
             switch (path.extname(id)) {
@@ -41,21 +54,19 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
             };
         },
         async generateBundle(_options, bundle) {
-            const [systemjs, css, favicon] = await Promise.all([
+            const [systemjs, css, favicon, footer] = await Promise.all([
                 emitFile({
                     context: this,
                     name: 'env.js',
-                    file: [
-                        path.join(assetDirectory, 'prepare.js'),
-                        require.resolve('systemjs/dist/s.min.js'),
-                    ],
+                    file: [assets.polyfill, assets.systemjs],
                 }),
                 emitCSS({context: this, cssProcessor}),
                 emitFile({
                     context: this,
                     name: 'favicon.png',
-                    file: path.join(assetDirectory, 'favicon.png'),
+                    file: assets.favicon,
                 }),
+                fs.promises.readFile(assets.footer, 'utf8'),
             ]);
             await Promise.all(Object.values(bundle).map(async (chunk) => {
                 if (chunk.type === 'chunk' && chunk.facadeModuleId) {
@@ -67,6 +78,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
                             htmlFilePath: chunk.facadeModuleId,
                             baseDir: props.baseDir,
                             files: {systemjs, js: chunk.fileName, css, favicon},
+                            footer,
                         });
                     }
                 }

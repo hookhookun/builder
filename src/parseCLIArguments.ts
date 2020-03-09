@@ -18,6 +18,9 @@ export const parseCLIArguments = (
             case '--dest':
                 options.dest = absolute(cliArgumentList[++index], cwd);
                 break;
+            case '--debug':
+                options.debug = true;
+                break;
             default:
         }
     }
@@ -25,5 +28,6 @@ export const parseCLIArguments = (
         src: options.src || path.join(cwd, 'src'),
         dest: options.dest || path.join(cwd, 'dest'),
         watch: options.watch || false,
+        debug: options.debug,
     };
 };
