@@ -85,18 +85,16 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
                 if (chunk.type === 'chunk' && chunk.facadeModuleId) {
                     let promise = htmlProcessor.promises.get(chunk.facadeModuleId);
                     if (promise) {
+                        const {$, dependencies} = await promise;
                         await emitHTML({
                             context: this,
-                            $: (await promise).$,
+                            $,
                             htmlFilePath: chunk.facadeModuleId,
                             baseDir: props.baseDir,
                             files: {systemjs, js: chunk.fileName, css, favicon},
                             header,
                             footer,
-                            noScript: [
-                                ...chunk.imports,
-                                ...chunk.dynamicImports,
-                            ].every((dependency) => !(/\.[jt]s$/).test(dependency)),
+                            noScript: dependencies.every((dependency) => !(/\.[jt]s$/).test(dependency)),
                         });
                     }
                 }
