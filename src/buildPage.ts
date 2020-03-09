@@ -44,8 +44,11 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
             const [systemjs, css, favicon] = await Promise.all([
                 emitFile({
                     context: this,
-                    name: 'system.js',
-                    file: require.resolve('systemjs/dist/s.min.js'),
+                    name: 'env.js',
+                    file: [
+                        path.join(assetDirectory, 'prepare.js'),
+                        require.resolve('systemjs/dist/s.min.js'),
+                    ],
                 }),
                 emitCSS({context: this, cssProcessor}),
                 emitFile({
