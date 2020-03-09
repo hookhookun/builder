@@ -5,7 +5,7 @@ import {relativeURL} from '../relativeURL';
 import {replaceReferenceAll} from '../replaceReference';
 
 export const emitHTML = async (
-    {context, $: $$, htmlFilePath, baseDir, header, footer, files}: {
+    {context, $: $$, htmlFilePath, baseDir, header, footer, files, noScript}: {
         context: rollup.PluginContext,
         $: CheerioStatic,
         htmlFilePath: string,
@@ -18,6 +18,7 @@ export const emitHTML = async (
             css: string,
             favicon: string,
         },
+        noScript?: boolean,
     },
 ) => {
     const $ = cheerio.load($$.html());
@@ -36,9 +37,13 @@ export const emitHTML = async (
         `<link rel="stylesheet" href="${relativeURL(pathToRoot, files.css)}">`,
         ($('body').html() || '').trim(),
         footer,
-        `<script src="${relativeURL(pathToRoot, files.systemjs)}"></script>`,
-        `<script>System.import('${relativeURL(pathToRoot, files.js)}')</script>`,
     );
+    if (!noScript) {
+        parts.push(
+            `<script src="${relativeURL(pathToRoot, files.systemjs)}"></script>`,
+            `<script>System.import('${relativeURL(pathToRoot, files.js)}')</script>`,
+        );
+    }
     context.emitFile({
         type: 'asset',
         source: parts.join('\n'),

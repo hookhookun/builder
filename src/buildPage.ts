@@ -93,6 +93,10 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
                             files: {systemjs, js: chunk.fileName, css, favicon},
                             header,
                             footer,
+                            noScript: [
+                                ...chunk.imports,
+                                ...chunk.dynamicImports,
+                            ].every((dependency) => !(/\.[jt]s$/).test(dependency)),
                         });
                     }
                 }
