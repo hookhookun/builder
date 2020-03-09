@@ -1,11 +1,5 @@
-:root {
-    --Width: 92vw;
-    --MaxWidth: 720px;
-}
-
-body>* {
-    width: var(--Width);
-    max-width: var(--MaxWidth);
+body>main>* {
+    width: var(--BaseWidth);
     margin-left: auto;
     margin-right: auto;
 }
