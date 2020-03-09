@@ -26,7 +26,7 @@ export const parseCLIArguments = (
     }
     return {
         src: options.src || path.join(cwd, 'src'),
-        dest: options.dest || path.join(cwd, 'dest'),
+        dest: options.dest || path.join(cwd, 'dist'),
         watch: options.watch || false,
         debug: options.debug,
     };
