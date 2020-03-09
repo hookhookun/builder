@@ -1,6 +1,7 @@
 import * as path from 'path';
 import {CSSProcessor} from './CSSProcessor';
 import {loadHTML} from './loadHTML';
+import {cheerioElementToString} from './cheerioElementToString';
 
 export interface HTMLProcessorProps {
     cssProcessor?: CSSProcessor,
@@ -35,18 +36,36 @@ export class HTMLProcessor {
         $('link[href^="."][rel="stylesheet"]').remove().each((_, {attribs: {href}}) => {
             dependencies.push(href);
         });
-        if (this.cssProcessor) {
+        const {cssProcessor} = this;
+        if (cssProcessor) {
             const directory = path.dirname(htmlFilePath);
-            const cssFiles: Array<string> = [];
-            for (const dependency of dependencies) {
-                if (path.extname(dependency) === '.css') {
-                    cssFiles.push(path.join(directory, dependency));
-                }
-            }
-            const classNameMapping = await this.cssProcessor.getMapping(cssFiles);
+            const mappings = await Promise.all(
+                [
+                    [
+                        htmlFilePath,
+                        $('style').remove().toArray().map(cheerioElementToString).join('\n'),
+                    ],
+                    ...dependencies
+                    .filter((dependency) => path.extname(dependency) === '.css')
+                    .map((dependency) => path.join(directory, dependency)),
+                ]
+                .map(async (entry) => {
+                    const [file, css] = typeof entry === 'string' ? [entry] : entry;
+                    return (await cssProcessor.process(file, css)).map;
+                }),
+            );
             $('[class]').each((_, {attribs}) => {
                 attribs.class = attribs.class.trim().split(/\s+/)
-                .map((name) => classNameMapping.get(name) || name)
+                .map((name) => {
+                    const replacements: Array<string> = [];
+                    for (const mapping of mappings) {
+                        const found = mapping.get(name);
+                        if (found) {
+                            replacements.push(found);
+                        }
+                    }
+                    return replacements.join(' ') || name;
+                })
                 .join(' ');
             });
         }
