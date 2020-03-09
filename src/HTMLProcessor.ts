@@ -40,20 +40,19 @@ export class HTMLProcessor {
         if (cssProcessor) {
             const directory = path.dirname(htmlFilePath);
             const mappings = await Promise.all(
-                [
-                    [
-                        htmlFilePath,
-                        $('style').remove().toArray().map(cheerioElementToString).join('\n'),
-                    ],
-                    ...dependencies
-                    .filter((dependency) => path.extname(dependency) === '.css')
-                    .map((dependency) => path.join(directory, dependency)),
-                ]
-                .map(async (entry) => {
-                    const [file, css] = typeof entry === 'string' ? [entry] : entry;
-                    return (await cssProcessor.process(file, css)).map;
+                dependencies
+                .filter((dependency) => path.extname(dependency) === '.css')
+                .map(async (dependency) => {
+                    const file = path.join(directory, dependency);
+                    return (await cssProcessor.process(file)).map;
                 }),
             );
+            const documentCSS = $('style').remove().toArray()
+            .map((element) => cheerioElementToString(element).trim())
+            .join('\n');
+            if (documentCSS) {
+                mappings.push((await cssProcessor.process(htmlFilePath, documentCSS)).map);
+            }
             $('[class]').each((_, {attribs}) => {
                 attribs.class = attribs.class.trim().split(/\s+/)
                 .map((name) => {
