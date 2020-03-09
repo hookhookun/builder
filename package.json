@@ -8,7 +8,6 @@
     "scripts": {
         "build": "tsc",
         "test": "run-s test:*",
-        "test:type": "tsc --noEmit",
         "test:build": "ts-node src --src sample-input --dest sample-output",
         "start": "ts-node src --src sample-input --dest dist --watch --debug"
     },
