@@ -1,11 +1,11 @@
 export const createIdentifier = () => {
     const dictionary = new Map<string, number>();
     return (key: string) => {
-        let renamed = dictionary.get(key);
-        if (!renamed) {
-            renamed = dictionary.size;
-            dictionary.set(key, renamed);
+        let id = dictionary.get(key) || -1;
+        if (!(0 <= id)) {
+            id = dictionary.size + 1;
+            dictionary.set(key, id);
         }
-        return renamed;
+        return id;
     };
 };
