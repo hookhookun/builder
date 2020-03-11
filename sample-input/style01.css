@@ -4,10 +4,6 @@ body>main>* {
     margin-right: auto;
 }
 
-li {
-    margin: 0.4rem 0;
-}
-
 .Links a::before {
     content: attr(href);
 }
