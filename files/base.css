@@ -87,7 +87,6 @@ body>main {
 body>footer {
     width: 100%;
     max-width: none;
-    margin-top: 2rem;
     padding: 1rem 0 3rem 0;
     color: var(--White);
     background-color: var(--Black);
