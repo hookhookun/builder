@@ -9,7 +9,7 @@
         "build": "tsc",
         "test": "run-s test:*",
         "test:unit": "ava",
-        "test:build": "ts-node src --src sample-input --dest sample-output",
+        "test:build": "ts-node src --src sample-input --dest docs",
         "start": "ts-node src --src sample-input --dest dist --watch --debug"
     },
     "bin": {
