@@ -25,7 +25,6 @@ addEventListener('error', (error) => {
     const setTheme = (theme) => {
         const root = document.documentElement;
         const currentTheme = root.getAttribute(themeAttribute);
-        console.log({currentTheme, theme});
         if (currentTheme !== theme) {
             root.setAttribute(themeAttribute, theme);
         }
