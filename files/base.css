@@ -9,6 +9,10 @@
     line-height: inherit;
     border: none;
     outline: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    -webkit-appearance: none;
 }
 
 :root {
