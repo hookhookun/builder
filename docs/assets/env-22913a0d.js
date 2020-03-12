@@ -1,6 +1,25 @@
-addEventListener('error', (error) => {
+addEventListener('error', (event) => {
     const errorElement = document.createElement('pre');
-    errorElement.textContent = error.stack || error.toString();
+    const message = [];
+    if (event.error) {
+        message.push(event.error.stack || event.error.message);
+    } else {
+        if (event.message) {
+            message.push(event.message);
+        }
+        if (event.filename) {
+            message.push(event.filename);
+        }
+        if (event.lineno) {
+            message.push(':');
+            message.push(event.lineno);
+        }
+        if (event.colno) {
+            message.push(':');
+            message.push(event.colno);
+        }
+    }
+    errorElement.textContent = message.join('');
     document.body.prepend(errorElement);
 });
 {
