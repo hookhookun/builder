@@ -63,7 +63,11 @@ addEventListener('error', (event) => {
         setTheme(dark ? Dark : Light);
     };
     const query = matchMedia('(prefers-color-scheme: dark)');
-    query.addEventListener('change', onChangeTheme);
+    if (query.addEventListener) {
+        query.addEventListener('change', onChangeTheme);
+    } else if (query.addListener) {
+        query.addListener(onChangeTheme);
+    }
     setTheme(localStorage.theme || (query.matches ? Dark : Light));
     /**
      * @param {Event} event 
