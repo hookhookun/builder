@@ -9,11 +9,14 @@
         "build": "tsc",
         "test": "run-s test:*",
         "test:unit": "ava",
-        "test:build": "ts-node src --src sample-input --dest docs",
+        "test:build": "run-s test:build:*",
+        "test:build:remove": "ts-node src/removeCLI.ts docs",
+        "test:build:build": "ts-node src --src sample-input --dest docs",
         "start": "ts-node src --src sample-input --dest dist --watch --debug"
     },
     "bin": {
-        "build-page": "lib/index.js"
+        "build-page": "lib/index.js",
+        "rmrf": "lib/removeCLI.js"
     },
     "files": [
         "lib",
