@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+const cwd = process.cwd();
+
 export const removeDirectory = async (
     directory: string,
 ): Promise<void> => {
@@ -18,6 +20,9 @@ export const removeDirectory = async (
 export const remove = async (
     filePath: string,
 ): Promise<void> => {
+    if (!(/^[^.]/).exec(path.relative(cwd, filePath))) {
+        throw new Error('CannotRemoveCWD');
+    }
     const stats = await fs.promises.stat(filePath)
     .catch((error) => {
         if (error.code === 'ENOENT') {

@@ -3,7 +3,6 @@ import * as rollup from 'rollup';
 import {sucrase, nodeResolve, commonjs, replace, terser} from './plugins';
 import {buildPage} from './buildPage';
 import {removeSourceMapReference} from './removeSourceMapReference';
-import {remove} from './remove';
 import {watch} from './watch';
 import {glob} from './glob';
 
@@ -34,7 +33,6 @@ export const build = async (options: BuildOptions) => {
     const input = await glob(path.join(options.src, '**/*.html'));
     const inputOptions: rollup.InputOptions = {input, plugins};
     const format = 'system';
-    await remove(options.dest);
     if (options.watch) {
         await watch(inputOptions, {format, dir: options.dest});
     } else {
