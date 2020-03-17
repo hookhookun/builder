@@ -21,7 +21,7 @@
     --BackgroundColor: var(--White);
     --ForegroundColor: var(--Black);
     --BaseWidth: 713px;
-    font-family: system-ui, sans-serif;
+    font-family: Titillium Web, BIZ UDGothic, system-ui, sans-serif;
     font-size: 16px;
     background-color: var(--BackgroundColor);
     color: var(--ForegroundColor);
