@@ -40,6 +40,7 @@
     @media (max-width: 775px) {
         --BaseWidth: 92vw;
     }
+    --BasePadding: calc(50vw - var(--BaseWidth) / 2);
     --BackgroundColor: var(--White);
     --ForegroundColor: var(--Black);
     @media (prefers-color-scheme: dark) {
@@ -61,30 +62,122 @@
     color: var(--ForegroundColor);
 }
 
+body {
+    &>main {
+        min-height: 100vh;
+    }
+    &>footer {
+        --Padding: 2rem;
+        @media (max-width: 775px) {
+            --Padding: 4vw;
+        }
+        --ForegroundColor: var(--White);
+        --BackgroundColor: var(--Black);
+        width: 100%;
+        max-width: none;
+        padding: var(--Padding) 0 var(--Padding) 0;
+        color: var(--ForegroundColor);
+        background-color: var(--BackgroundColor);
+        border-top: 1px solid var(--White); 
+        &>svg {
+            --ForegroundColor: var(--Black);
+            float: left;
+            max-width: 4rem;
+            margin: 0 2rem 2rem var(--BasePadding);
+            background-color: var(--White);
+            border-radius: 50%;
+        }
+        &>nav {
+            width: var(--BaseWidth);
+            margin: 0 auto;
+            text-align: right;
+            &>* {
+                display: block;
+                line-height: 1rem;
+                margin-bottom: 1rem;
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+        &>aside {
+            width: var(--BaseWidth);
+            margin: 1rem auto 0 auto;
+            @media (min-width: 440px) {
+                position: absolute;
+                left: var(--BasePadding);
+                bottom: var(--Padding);
+            }
+        }
+    }
+}
+
+@keyframes LogoEye {
+    0% {
+        transform: scale(1, 1);
+    }
+    10% {
+        transform: scale(1, 1);
+    }
+    11% {
+        transform: scale(1, 0.1);
+    }
+    13% {
+        transform: scale(1, 1);
+    }
+    82% {
+        transform: scale(1, 1);
+    }
+    83% {
+        transform: scale(1, 0.1);
+    }
+    84% {
+        transform: scale(1, 1);
+    }
+    85% {
+        transform: scale(1, 0.1);
+    }
+    86% {
+        transform: scale(1, 1);
+    }
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+svg[data-svg=Logo] {
+    fill: var(--ForegroundColor);
+    stroke: var(--ForegroundColor);
+}
+
+circle[data-svg=LogoEye] {
+    animation: 6s LogoEye infinite;
+}
+
 h1 {
     margin: 1rem auto 0.5rem auto;
-    padding: 0.25rem;
+    padding: 0.25rem 0;
     font-size: 1.5rem;
     line-height: 2rem;
 }
 
 h2 {
     margin: 0.5rem auto;
-    padding: 0.3rem;
+    padding: 0.3rem 0;
     font-size: 1.3rem;
     line-height: 1.7rem;
 }
 
 h3, h4, h5, h6 {
     margin: 0.5rem auto;
-    padding: 0.3rem;
+    padding: 0.3rem 0;
     line-height: 1.4rem;
     font-weight: bolder;
 }
 
 p {
     margin: 0 auto;
-    padding: 0.2rem;
+    padding: 0.2rem 0;
     line-height: 1.6rem;
     &+p {
         margin-top: -0.4rem;
@@ -98,12 +191,17 @@ p::before {
 }
 
 ul, ol {
-    padding-left: 1.5rem;
+    margin: 0.5rem auto;
+    padding-left: 1.8rem;
 }
 
 li {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    padding: 0.2rem 0;
+    line-height: 1.6rem;
+}
+
+img {
+    display: block;
 }
 
 svg {
@@ -112,30 +210,12 @@ svg {
     stroke-linejoin: round;
 }
 
-body {
-    &>main {
-        min-height: 100vh;
-    }
-    &>footer {
-        width: 100%;
-        max-width: none;
-        padding: 1rem 0 3rem 0;
-        color: var(--White);
-        background-color: var(--Black);
-        border-top: 1px solid var(--White); 
-        &>* {
-            width: var(--BaseWidth);
-            margin-left: auto;
-            margin-right: auto;
-        }
-    }
-}
-
 input {
     &[name=Theme] {
         display: none;
         &+label {
-            margin-right: 0.4rem;
+            display: inline;
+            text-decoration: underline;
             &::before {
                 content: '☐';
                 display: inline-block;

@@ -44,9 +44,17 @@ export const emitHTML = async (
             `<script>System.import('${relativeURL(pathToRoot, files.js)}')</script>`,
         );
     }
+    const now = new Date();
+    const date = [
+        now.getFullYear(),
+        `${now.getMonth() + 1}`.padStart(2, '0'),
+        `${now.getDate()}`.padStart(2, '0'),
+    ].join('-')
     context.emitFile({
         type: 'asset',
-        source: parts.join('\n'),
+        source: parts.join('\n')
+        .split('__CURRENT_DATETIME_ISO__').join(new Date().toISOString())
+        .split('__CURRENT_DATE__').join(date),
         fileName: path.relative(baseDir, htmlFilePath),
     });
 };

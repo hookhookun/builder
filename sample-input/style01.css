@@ -11,3 +11,7 @@ body>main>* {
 .StyleTest.Style1::after {
     content: 'Applied!';
 }
+
+main {
+    padding-bottom: 2rem;
+}

@@ -51,7 +51,14 @@
             ctx.moveTo(x - tick, y2);
             ctx.lineTo(x + tick, y2);
             ctx.stroke();
-            ctx.fillText(d.toFixed(1), x, avg(y1, y2));
+            ctx.save();
+            const text = d.toFixed(1);
+            const y = avg(y1, y2);
+            const textWidth = ctx.measureText(text).width;
+            ctx.fillStyle = color(0, 0, 0, 0.5);
+            ctx.fillRect(x - textWidth, y - 5, textWidth, 10);
+            ctx.restore();
+            ctx.fillText(text, x, y);
         }
     };
     const color = (r: number, g: number, b: number, o = 1) => {
@@ -59,6 +66,20 @@
         return `rgba(${rgb},${o})`;
     };
     const avg = (...values: Array<number>) => values.reduce((a, b) => a + b) / values.length;
+    const listElements = (element: Element) => {
+        const list: Array<Element> = [];
+        for (const child of element.children) {
+            switch (child.tagName.toLowerCase()) {
+                case 'ul':
+                case 'ol':
+                    list.push(...child.children);
+                    break;
+                default:
+                    list.push(child);
+            }
+        }
+        return list;
+    };
     const id = 'StyleChecker';
     const checkStyle = () => {
         const canvas = document.createElement('canvas');
@@ -76,13 +97,14 @@
             height: '100%',
             pointerEvents: 'none',
         });
-        canvas.width = bodyRect.width;
-        canvas.height = bodyRect.height;
+        canvas.width = bodyRect.width * devicePixelRatio;
+        canvas.height = bodyRect.height * devicePixelRatio;
         const ctx = canvas.getContext('2d');
+        ctx.scale(devicePixelRatio, devicePixelRatio);
         ctx.font = '9px sans-serif';
         ctx.textBaseline = 'middle';
         let previous: Result | null = null;
-        for (const element of main.children) {
+        for (const element of listElements(main)) {
             const style = getComputedStyle(element);
             ctx.strokeStyle = color(1, 1, 1);
             ctx.lineWidth = 1;
