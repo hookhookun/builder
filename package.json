@@ -10,9 +10,11 @@
         "test": "run-s test:*",
         "test:unit": "ava",
         "test:build": "run-s test:build:*",
-        "test:build:remove": "ts-node src/removeCLI.ts docs",
+        "test:cleanup": "ts-node src/removeCLI.ts docs",
         "test:build:build": "ts-node src --src sample-input --dest docs",
-        "start": "ts-node src --src sample-input --dest dist --watch --debug"
+        "start": "run-s start:*",
+        "start:cleanup": "ts-node src/removeCLI.ts dist",
+        "start:watch": "ts-node src --src sample-input --dest dist --watch --debug"
     },
     "bin": {
         "build-page": "lib/index.js",
@@ -34,6 +36,7 @@
         "fast-glob": "^3.2.2",
         "magic-string": "^0.25.7",
         "postcss": "^7.0.27",
+        "postcss-nested": "^4.2.1",
         "postcss-selector-parser": "^6.0.2",
         "rollup": "^2.0.6",
         "rollup-plugin-terser": "^5.3.0",

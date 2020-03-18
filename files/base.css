@@ -15,54 +15,86 @@
     -webkit-appearance: none;
 }
 
+::before,
+::after {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font: inherit;
+    color: inherit;
+    background: none;
+    line-height: inherit;
+    border: none;
+    outline: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    -webkit-appearance: none;
+}
+
 :root {
     --White: rgb(239, 239, 239);
     --Black: rgb(35, 35, 35);
-    --BackgroundColor: var(--White);
-    --ForegroundColor: var(--Black);
     --BaseWidth: 713px;
-    font-family: Titillium Web, BIZ UDGothic, system-ui, sans-serif;
-    font-size: 16px;
-    background-color: var(--BackgroundColor);
-    color: var(--ForegroundColor);
-    line-height: 1;
-}
-
-@media (max-width: 775px) {
-    :root {
+    @media (max-width: 775px) {
         --BaseWidth: 92vw;
     }
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
+    --BackgroundColor: var(--White);
+    --ForegroundColor: var(--Black);
+    @media (prefers-color-scheme: dark) {
         --BackgroundColor: var(--Black);
         --ForegroundColor: var(--White);
     }
-}
-
-:root[data-theme=Dark] {
-    --BackgroundColor: var(--Black);
-    --ForegroundColor: var(--White);
-}
-
-:root[data-theme=Light] {
-    --BackgroundColor: var(--White);
-    --ForegroundColor: var(--Black);
+    &[data-theme=Dark] {
+        --BackgroundColor: var(--Black);
+        --ForegroundColor: var(--White);
+    }
+    &[data-theme=Light] {
+        --BackgroundColor: var(--White);
+        --ForegroundColor: var(--Black);
+    }
+    font-family: 'Hiragino UD Sans Std', Arial, 'BIZ UDGothic', 'Hiragino Kaku Gothic Pro', Meiryo, sans-serif;
+    font-size: 1rem;
+    line-height: 1rem;
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
 }
 
 h1 {
-    margin: 2rem auto 1rem auto;
-    font-size: 150%;
+    margin: 1rem auto 0.5rem auto;
+    padding: 0.25rem;
+    font-size: 1.5rem;
+    line-height: 2rem;
 }
 
 h2 {
-    margin: 2rem auto 1rem auto;
+    margin: 0.5rem auto;
+    padding: 0.3rem;
+    font-size: 1.3rem;
+    line-height: 1.7rem;
+}
+
+h3, h4, h5, h6 {
+    margin: 0.5rem auto;
+    padding: 0.3rem;
+    line-height: 1.4rem;
     font-weight: bolder;
 }
 
 p {
-    margin: 1rem auto;
+    margin: 0 auto;
+    padding: 0.2rem;
+    line-height: 1.6rem;
+    &+p {
+        margin-top: -0.4rem;
+    }
+}
+
+p::before {
+    content: '';
+    display: inline-block;
+    width: 1rem;
 }
 
 ul, ol {
@@ -80,43 +112,41 @@ svg {
     stroke-linejoin: round;
 }
 
-body>main {
-    min-height: 100vh;
+body {
+    &>main {
+        min-height: 100vh;
+    }
+    &>footer {
+        width: 100%;
+        max-width: none;
+        padding: 1rem 0 3rem 0;
+        color: var(--White);
+        background-color: var(--Black);
+        border-top: 1px solid var(--White); 
+        &>* {
+            width: var(--BaseWidth);
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
 }
 
-body>footer {
-    width: 100%;
-    max-width: none;
-    padding: 1rem 0 3rem 0;
-    color: var(--White);
-    background-color: var(--Black);
-    border-top: 1px solid var(--White); 
-}
-
-body>footer>* {
-    width: var(--BaseWidth);
-    margin-left: auto;
-    margin-right: auto;
-}
-
-input[name=Theme] {
-    display: none;
-}
-
-input[name=Theme]+label {
-    margin-right: 0.4rem;
-}
-
-input[name=Theme]+label::before {
-    content: '☐';
-    display: inline-block;
-    margin-right: 0.2rem;
-}
-
-input[name=Theme]:checked+label {
-    font-weight: bolder;
-}
-
-input[name=Theme]:checked+label::before {
-    content: '☑';
+input {
+    &[name=Theme] {
+        display: none;
+        &+label {
+            margin-right: 0.4rem;
+            &::before {
+                content: '☐';
+                display: inline-block;
+                margin-right: 0.2rem;
+            }
+        }
+        &:checked+label {
+            font-weight: bolder;
+            &::before {
+                content: '☑';
+            }
+        }
+    }
 }
