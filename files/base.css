@@ -40,7 +40,7 @@
     @media (max-width: 775px) {
         --BaseWidth: 92vw;
     }
-    --BasePadding: calc(50vw - var(--BaseWidth) / 2);
+    --BasePadding: calc(50% - var(--BaseWidth) / 2);
     --BackgroundColor: var(--White);
     --ForegroundColor: var(--Black);
     @media (prefers-color-scheme: dark) {
