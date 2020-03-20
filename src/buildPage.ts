@@ -37,7 +37,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
     };
     return {
         name: 'BuildPage',
-        async buildStart() {
+        async buildStart(): Promise<void> {
             if (props.debug) {
                 this.addWatchFile(assets.baseCSS);
                 this.addWatchFile(assets.polyfill);
@@ -46,7 +46,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
             }
             await cssProcessor.process(assets.baseCSS);
         },
-        async load(id) {
+        async load(id): Promise<rollup.LoadResult | null> {
             switch (path.extname(id)) {
                 case '.html': {
                     return await htmlProcessor.generateScript(id);
@@ -57,7 +57,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
                     return null;
             }
         },
-        outputOptions(options) {
+        outputOptions(options): rollup.OutputOptions {
             return {
                 ...options,
                 assetFileNames: 'assets/[name]-[hash][extname]',
@@ -65,7 +65,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
                 entryFileNames: 'assets/[name]-[hash].js',
             };
         },
-        async generateBundle(_options, bundle) {
+        async generateBundle(_options, bundle): Promise<void> {
             const [systemjs, css, favicon, header, footer] = await Promise.all([
                 emitFile({
                     context: this,
@@ -83,7 +83,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
             ]);
             await Promise.all(Object.values(bundle).map(async (chunk) => {
                 if (chunk.type === 'chunk' && chunk.facadeModuleId) {
-                    let promise = htmlProcessor.promises.get(chunk.facadeModuleId);
+                    const promise = htmlProcessor.promises.get(chunk.facadeModuleId);
                     if (promise) {
                         const {$, dependencies} = await promise;
                         await emitHTML({
@@ -100,7 +100,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
                 }
             }));
         },
-        watchChange(id) {
+        watchChange(id): void {
             htmlProcessor.promises.delete(id);
             cssProcessor.promises.delete(id);
         },

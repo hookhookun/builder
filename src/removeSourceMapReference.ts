@@ -11,7 +11,7 @@ export const removeSourceMapReference = (
     const filter = createFilter(props.include, props.exclude);
     return {
         name: 'RemoveSourceMapReference',
-        transform(code, id) {
+        transform(code, id): rollup.TransformResult | null {
             if (filter(id)) {
                 const matched = (/\/\/\s*#\s*sourceMappingURL=\S+\s*[\r\n]?/).exec(code);
                 if (matched) {

@@ -12,5 +12,5 @@ export const getContentType = (
             return 'text/css';
         default:
             return 'text/plain';
-    };
+    }
 };

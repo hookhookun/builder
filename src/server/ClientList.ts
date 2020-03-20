@@ -14,7 +14,7 @@ export class ClientList {
     public connect(
         req: http.IncomingMessage,
         res: http.ServerResponse,
-    ) {
+    ): void {
         const ua = req.headers['user-agent'];
         if (req.headers.accept === 'text/event-stream') {
             res.writeHead(200, {'content-type': 'text/event-stream'});
@@ -31,13 +31,13 @@ export class ClientList {
     public disconnect(
         {headers}: http.IncomingMessage,
         res: http.ServerResponse
-    ) {
+    ): void {
         this.connections.delete(res);
         console.log(`Disconnected: ${headers['user-agent']}`);
         this.stopTimer();
     }
 
-    public broadcast(...messages: Array<string>) {
+    public broadcast(...messages: Array<string>): void {
         for (const connection of this.connections) {
             for (const message of messages) {
                 connection.write(message);
@@ -49,11 +49,11 @@ export class ClientList {
         return this.connections.size;
     }
 
-    private keepAlive() {
+    private keepAlive(): void {
         this.broadcast(': keepalive\n\n');
     }
 
-    private startTimer() {
+    private startTimer(): void {
         if (0 < this.connectionCount) {
             this.timerId = setInterval(() => {
                 this.keepAlive();
@@ -61,7 +61,7 @@ export class ClientList {
         }
     }
 
-    private stopTimer() {
+    private stopTimer(): void {
         if (this.connectionCount === 0 && this.timerId) {
             clearInterval(this.timerId);
         }

@@ -7,10 +7,10 @@ import {relativeURL} from './relativeURL';
 export const watch = async (
     inputOptions: rollup.InputOptions,
     outputOptions: rollup.OutputOptions & {dir: string},
-) => {
+): Promise<void> => {
     const watcher = rollup.watch([{...inputOptions, output: outputOptions}]);
     await new Promise((resolve) => {
-        const onEvent = (event: rollup.RollupWatcherEvent) => {
+        const onEvent = (event: rollup.RollupWatcherEvent): void => {
             console.log(event.code);
             if (event.code === 'ERROR') {
                 console.error(event.error);

@@ -13,7 +13,7 @@ export interface BuildOptions {
     debug?: boolean,
 }
 
-export const build = async (options: BuildOptions) => {
+export const build = async (options: BuildOptions): Promise<void> => {
     console.log(options);
     const plugins = [
         replace({'process.env.NODE_ENV': options.watch ? '\'\'' : '\'production\''}),

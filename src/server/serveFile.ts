@@ -12,7 +12,7 @@ export const serveFile = async (
         documentRoot: string,
         eventSourceEndpoint: string,
     },
-) => {
+): Promise<void> => {
     if (!req.url) {
         throw new Error(`NoURL: req.url is ${req.url}`);
     }
@@ -34,11 +34,11 @@ export const serveFile = async (
         const snippet = Buffer.from(`\n<script>\n${reloadScript}\n</script>`);
         headers['content-length'] += snippet.length;
         source = source.pipe(new stream.Transform({
-            transform(chunk, _encoding, callback) {
+            transform(chunk, _encoding, callback): void {
                 this.push(chunk);
                 callback();
             },
-            flush(callback) {
+            flush(callback): void {
                 this.push(snippet);
                 callback();
             },

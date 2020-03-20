@@ -16,7 +16,7 @@ export class FileChecker {
     public readonly filter: FileStateFilter;
 
     public constructor(
-        filter: FileStateFilter = (state) => Boolean(state),
+        filter: FileStateFilter = (state): boolean => Boolean(state),
     ) {
         this.cache = new Map();
         this.filter = filter;

@@ -10,7 +10,7 @@ export const handleRequest = async (
         eventSourceEndpoint: string,
         clientList: ClientList,
     },
-) => {
+): Promise<void> => {
     console.log(`${req.method} ${req.url}`);
     if (req.url === props.eventSourceEndpoint) {
         props.clientList.connect(req, res);

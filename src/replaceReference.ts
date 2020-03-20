@@ -46,7 +46,7 @@ export const replaceReferenceAll = async (
         directory: string,
         pathToRoot: string,
     },
-) => {
+): Promise<void> => {
     const promises: Array<Promise<void>> = [];
     for (const attribute of ['href', 'src']) {
         props.$(`[${attribute}^="."]`).each((_, element) => {

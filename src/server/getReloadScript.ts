@@ -3,9 +3,9 @@ import * as path from 'path';
 
 const cache = new Map<string, Promise<string>>();
 
-export const generateReloadScript = async (
+export const _getReloadScript = async (
     endpoint: string,
-) => {
+): Promise<string> => {
     const scriptPath = path.join(__dirname, 'reload.js');
     const code = await fs.promises.readFile(scriptPath, 'utf8');
     return code.replace(/\{\{ENDPOINT\}\}/, endpoint);
@@ -16,7 +16,7 @@ export const getReloadScript = async (
 ): Promise<string> => {
     let promise = cache.get(endpoint);
     if (!promise) {
-        promise = generateReloadScript(endpoint);
+        promise = _getReloadScript(endpoint);
     }
     return await promise;
 };
