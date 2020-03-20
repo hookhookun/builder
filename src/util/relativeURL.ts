@@ -30,7 +30,7 @@ export const relativeURL = (
             parts.push('');
         }
         if (parts[0] !== '..') {
-            parts.unshift('.')
+            parts.unshift('.');
         }
         return parts.join('/');
     }

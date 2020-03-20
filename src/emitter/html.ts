@@ -46,7 +46,7 @@ export const emitHTML = async (
         now.getFullYear(),
         `${now.getMonth() + 1}`.padStart(2, '0'),
         `${now.getDate()}`.padStart(2, '0'),
-    ].join('-')
+    ].join('-');
     context.emitFile({
         type: 'asset',
         source: parts.join('\n')
