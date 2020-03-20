@@ -7,8 +7,8 @@ const png8x6 = Base64.decode([
     'hBQAAAAFzUkdCAK7OHOkAAABIUExURQAAAJkvWcxyr4QuUbl2rbROgaxEdrVbmq',
     '5PhrNWkXwlPKZEd5pDWqg+aFYxOrlamKA9a5YzYJ1DgpdRiZAmUGE9S7Zhhq1Wd',
     '29cwz8AAAABdFJOUwBA5thmAAAANklEQVQI1xXGWwKAIAgEwFVBIFLLR93/puV8',
-    'DdhLwBZN/Tx2xJRzBbo0U13AfcnvTZhhENGTPiK+AYD2ttbOAAAAAElFTkSuQmCC'
-].join());
+    'DdhLwBZN/Tx2xJRzBbo0U13AfcnvTZhhENGTPiK+AYD2ttbOAAAAAElFTkSuQmCC',
+].join(''));
 
 test('Load an 8x6 png image', (t) => {
     const result = [...parsePNG(png8x6)];
