@@ -5,6 +5,7 @@ import {buildPage} from './buildPage';
 import {removeSourceMapReference} from './removeSourceMapReference';
 import {watch} from './watch';
 import {glob} from './nodeutil/glob';
+import {hookunResolve} from './hookunResolve';
 
 export interface BuildOptions {
     src: string,
@@ -17,6 +18,7 @@ export const build = async (options: BuildOptions): Promise<void> => {
     console.log('Builder', options);
     const plugins = [
         replace({'process.env.NODE_ENV': options.watch ? '\'\'' : '\'production\''}),
+        hookunResolve(),
         buildPage({
             baseDir: options.src,
             production: !options.watch,
