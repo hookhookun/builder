@@ -6,7 +6,7 @@ const test = (
     expected: ReturnType<typeof classnames>,
 ): void => {
     ava(`${JSON.stringify(args)} -> ${JSON.stringify(expected)}`, (t) => {
-        t.deepEqual(classnames(...args), expected);
+        t.is(classnames(...args), expected);
     });
 };
 
