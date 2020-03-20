@@ -6,7 +6,7 @@ const test = (
     html: string,
     callback: (t: ExecutionContext, window: DOMWindow) => void | Promise<void>,
 ): void => {
-    ava(html, async (t) => {
+    ava(`walkNode: ${html}`, async (t) => {
         const {window} = new JSDOM(`<!doctype html>${html}`, {
             url: 'https://example.com',
         });
