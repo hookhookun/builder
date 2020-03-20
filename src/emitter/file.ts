@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as rollup from 'rollup';
-import {ensureArray} from '../ensureArray';
+import {ensureArray} from '../util/ensureArray';
 
 export const emitFile = async (
     {context, name, file}: {

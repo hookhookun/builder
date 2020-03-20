@@ -1,6 +1,6 @@
 import * as path from 'path';
 import {BuildOptions} from './build';
-import {absolute} from './absolute';
+import {absolute} from './nodeutil/absolute';
 
 export const parseCLIArguments = (
     cliArgumentList: Array<string>,

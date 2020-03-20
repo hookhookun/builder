@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as rollup from 'rollup';
 import {startServer} from './server';
 import {FileChecker} from './server/FileChecker';
-import {relativeURL} from './relativeURL';
+import {relativeURL} from './util/relativeURL';
 
 export const watch = async (
     inputOptions: rollup.InputOptions,

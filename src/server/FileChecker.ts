@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import {glob} from '../glob';
+import {glob} from '../nodeutil/glob';
 
 export type FileState = 'add' | 'change' | '';
 export type FileStateFilter = (

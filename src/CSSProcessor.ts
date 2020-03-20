@@ -2,7 +2,7 @@ import * as postcss from 'postcss';
 import * as selectorParser from 'postcss-selector-parser';
 import {createIdentifier} from './createIdentifier';
 import {parseCSS} from './parseCSS';
-import {getIndent} from './getIndent';
+import {generateIndentString} from './util/generateIndentString';
 
 export type ClassNameMapping = Map<string, string>;
 
@@ -77,7 +77,7 @@ export class CSSProcessor {
         } = {indent: 4},
     ): Promise<string> {
         const mapping = (await this.process(cssFile)).map;
-        const indent = getIndent(options.indent);
+        const indent = generateIndentString(options.indent);
         const lines: Array<string> = [
             `export ${options.exportName ? `const ${options.exportName} =` : 'default'} {`,
         ];

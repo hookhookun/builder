@@ -4,7 +4,7 @@ import {sucrase, nodeResolve, commonjs, replace, terser} from './plugins';
 import {buildPage} from './buildPage';
 import {removeSourceMapReference} from './removeSourceMapReference';
 import {watch} from './watch';
-import {glob} from './glob';
+import {glob} from './nodeutil/glob';
 
 export interface BuildOptions {
     src: string,
@@ -14,7 +14,7 @@ export interface BuildOptions {
 }
 
 export const build = async (options: BuildOptions): Promise<void> => {
-    console.log(options);
+    console.log('Builder', options);
     const plugins = [
         replace({'process.env.NODE_ENV': options.watch ? '\'\'' : '\'production\''}),
         buildPage({

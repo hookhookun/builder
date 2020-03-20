@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as rollup from 'rollup';
-import {relativeURL} from './relativeURL';
+import {relativeURL} from './util/relativeURL';
 
 export const replaceReference = async (
     {

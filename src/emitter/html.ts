@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as rollup from 'rollup';
 import * as cheerio from 'cheerio';
-import {relativeURL} from '../relativeURL';
+import {relativeURL} from '../util/relativeURL';
 import {replaceReferenceAll} from '../replaceReference';
 
 export const emitHTML = async (

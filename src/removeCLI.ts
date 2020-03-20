@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import {remove} from './remove';
-import {absolute} from './absolute';
+import {absolute} from './nodeutil/absolute';
 
 const cwd = process.cwd();
 
