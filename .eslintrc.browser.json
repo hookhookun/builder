@@ -1,0 +1,22 @@
+{
+    "extends": [
+        ".eslintrc.base.json",
+        "plugin:react/recommended"
+    ],
+    "plugins": [
+        "react",
+        "react-hooks"
+    ],
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
+    "env": {
+        "browser": true
+    },
+    "rules": {
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "error"
+    }
+}

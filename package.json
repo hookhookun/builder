@@ -27,7 +27,7 @@
         "files",
         "@types",
         "tsconfig.base.json",
-        ".eslintrc.base.json"
+        ".eslintrc.*"
     ],
     "dependencies": {
         "@rollup/plugin-commonjs": "^11.0.2",
@@ -69,6 +69,20 @@
         ],
         "require": [
             "ts-node/register"
+        ]
+    },
+    "eslintConfig": {
+        "extends": ".eslintrc.node.json",
+        "env": {
+            "node": true
+        },
+        "overrides": [
+            {
+                "files": [
+                    "src/util/**"
+                ],
+                "extends": ".eslintrc.es.json"
+            }
         ]
     }
 }
