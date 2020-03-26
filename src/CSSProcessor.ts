@@ -1,5 +1,6 @@
 import * as postcss from 'postcss';
 import * as selectorParser from 'postcss-selector-parser';
+import * as animationParser from '@hookun/parse-animation-shorthand';
 import {createIdentifier} from './createIdentifier';
 import {parseCSS} from './parseCSS';
 import {generateIndentString} from './util/generateIndentString';
@@ -41,6 +42,15 @@ export class CSSProcessor {
         const root = await parseCSS(cssFilePath, css);
         const map: ClassNameMapping = new Map();
         const processor = selectorParser();
+        root.walkAtRules((atRule) => {
+            if (atRule.name === 'keyframes') {
+                const originalName = atRule.params;
+                const id = this.identify(`${cssFilePath} ${originalName}`);
+                const newName = this.getName(originalName, id);
+                map.set(originalName, newName);
+                atRule.params = newName;
+            }
+        });
         root.walkRules((rule) => {
             const selector = processor.astSync(rule.selector);
             selector.walkClasses((className) => {
@@ -53,6 +63,20 @@ export class CSSProcessor {
                 }
             });
             rule.selector = `${selector}`;
+            rule.walkDecls((decl) => {
+                const {prop, value} = decl;
+                if (prop === 'animation-name') {
+                    decl.value = map.get(value) || value;
+                } else if (prop === 'animation') {
+                    decl.value = animationParser.parse(value)
+                    .map((animation) => {
+                        const {name} = animation;
+                        animation.name = map.get(name) || name;
+                        return animationParser.serialize(animation);
+                    })
+                    .join(',');
+                }
+            });
         });
         return {root, map};
     }
@@ -72,11 +96,12 @@ export class CSSProcessor {
     public async generateScript(
         cssFile: string,
         options: {
+            css?: string,
             exportName?: string,
             indent: number | string,
         } = {indent: 4},
     ): Promise<string> {
-        const mapping = (await this.process(cssFile)).map;
+        const mapping = (await this.process(cssFile, options.css)).map;
         const indent = generateIndentString(options.indent);
         const lines: Array<string> = [
             `export ${options.exportName ? `const ${options.exportName} =` : 'default'} {`,
