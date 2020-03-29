@@ -6,6 +6,8 @@ import {HTMLProcessor} from './HTMLProcessor';
 import {emitCSS} from './emitter/css';
 import {emitHTML} from './emitter/html';
 import {emitFile} from './emitter/file';
+import {readSource} from './nodeutil/readSource';
+import {getHash} from './nodeutil/getHash';
 
 export interface BuildPageAssets {
     systemjs: string,
@@ -35,6 +37,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
         favicon: path.join(__dirname, '../files/favicon.png'),
         ...props.assets,
     };
+    const referencedFiles = new Set<rollup.EmittedFile>();
     return {
         name: 'BuildPage',
         async buildStart(): Promise<void> {
@@ -46,16 +49,29 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
             }
             await cssProcessor.process(assets.baseCSS);
         },
+        resolveId(importee): string | null {
+            return importee.startsWith('https://') ? importee : null;
+        },
         async load(id): Promise<rollup.LoadResult | null> {
             switch (path.extname(id)) {
-                case '.html': {
+                case '.ts':
+                case '.js':
+                case '.tsx':
+                case '.jsx':
+                    return null;
+                case '.html':
                     return await htmlProcessor.generateScript(id);
-                }
                 case '.css':
                     return await cssProcessor.generateScript(id);
                 default:
-                    return null;
             }
+            const source = await readSource(id);
+            const extname = path.extname(id);
+            const basename = path.basename(id, extname);
+            const hash = getHash(source);
+            const fileName = `assets/${basename}-${hash}${extname}`;
+            referencedFiles.add({type: 'asset', fileName, source});
+            return `export default '${fileName}';`;
         },
         outputOptions(options): rollup.OutputOptions {
             return {
@@ -66,6 +82,9 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
             };
         },
         async generateBundle(_options, bundle): Promise<void> {
+            for (const file of referencedFiles) {
+                this.emitFile(file);
+            }
             const [systemjs, css, favicon, header, footer] = await Promise.all([
                 emitFile({
                     context: this,

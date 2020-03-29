@@ -1,6 +1,6 @@
-import * as fs from 'fs';
 import * as rollup from 'rollup';
 import {ensureArray} from '../util/ensureArray';
+import {readSource} from '../nodeutil/readSource';
 
 export const emitFile = async (
     {context, name, file}: {
@@ -9,12 +9,11 @@ export const emitFile = async (
         file: string | Array<string>,
     },
 ): Promise<string> => {
+    const source = Buffer.concat(await Promise.all(ensureArray(file).map(readSource)));
     const referenceId = context.emitFile({
         type: 'asset',
         name,
-        source: Buffer.concat(await Promise.all(ensureArray(file).map(async (file) => {
-            return await fs.promises.readFile(file);
-        }))),
+        source,
     });
     return context.getFileName(referenceId);
 };
