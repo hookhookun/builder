@@ -65,13 +65,19 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
                     return await cssProcessor.generateScript(id);
                 default:
             }
-            const source = await readSource(id);
-            const extname = path.extname(id);
-            const basename = path.basename(id, extname);
-            const hash = getHash(source);
-            const fileName = `assets/${basename}-${hash}${extname}`;
-            referencedFiles.add({type: 'asset', fileName, source});
-            return `export default '${fileName}';`;
+            if (id.includes('\u0000')) {
+                return null;
+            }
+            const source = await readSource(id).catch(() => null);
+            if (source) {
+                const extname = path.extname(id);
+                const basename = path.basename(id, extname);
+                const hash = getHash(source);
+                const fileName = `assets/${basename}-${hash}${extname}`;
+                referencedFiles.add({type: 'asset', fileName, source});
+                return `export default '${fileName}';`;
+            }
+            return null;
         },
         outputOptions(options): rollup.OutputOptions {
             return {
