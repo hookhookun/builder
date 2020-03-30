@@ -37,7 +37,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
         favicon: path.join(__dirname, '../files/favicon.png'),
         ...props.assets,
     };
-    const referencedFiles = new Set<rollup.EmittedFile>();
+    const referencedFiles = new Map<string, rollup.EmittedFile>();
     return {
         name: 'BuildPage',
         async buildStart(): Promise<void> {
@@ -74,7 +74,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
                 const basename = path.basename(id, extname);
                 const hash = getHash(source);
                 const fileName = `assets/${basename}-${hash}${extname}`;
-                referencedFiles.add({type: 'asset', fileName, source});
+                referencedFiles.set(fileName, {type: 'asset', fileName, source});
                 return `export default '${fileName}';`;
             }
             return null;
@@ -88,7 +88,7 @@ export const buildPage = (props: BuildPagePluginProps): rollup.Plugin => {
             };
         },
         async generateBundle(_options, bundle): Promise<void> {
-            for (const file of referencedFiles) {
+            for (const [, file] of referencedFiles) {
                 this.emitFile(file);
             }
             const [systemjs, css, favicon, header, footer] = await Promise.all([
