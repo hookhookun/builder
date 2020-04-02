@@ -71,6 +71,9 @@ export class CSSProcessor {
                     decl.value = animationParser.parse(value)
                     .map((animation) => {
                         const {name} = animation;
+                        if (name === 'none') {
+                            return name;
+                        }
                         animation.name = map.get(name) || name;
                         return animationParser.serialize(animation);
                     })
