@@ -76,6 +76,8 @@ addEventListener('error', (event) => {
         } else {
             localStorage.setItem(storageKey, theme);
         }
+        const event = new CustomEvent('theme', {detail: theme});
+        document.documentElement.dispatchEvent(event);
     };
     /**
      * @param {MediaQueryList} query
