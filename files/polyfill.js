@@ -23,55 +23,93 @@ addEventListener('error', (event) => {
     document.body.prepend(errorElement);
 });
 {
-    const themeInput = 'input[name="Theme"]';
+    const themeInput = 'input[name="HookTheme"]';
+    const themeAutoInput = 'input[name="HookThemeAuto"]';
     const themeAttribute = 'data-theme';
     const Dark = 'Dark';
     const Light = 'Light';
+    const storageKey = 'HookTheme';
     /**
-     * @param {string} query 
-     * @param {(Element) => void} fn 
-     * @param {Element} node 
+     * @param {string} query
+     * @param {(Element, index: number) => boolean | void} fn
+     * @param {Element} node
+     * @return {Element | null}
      */
-    const forEach = (query, fn, node = document) => {
+    const find = (query, fn, node = document) => {
         const list = node.querySelectorAll(query);
         for (let index = 0; index < list.length; index++) {
-            fn(list[index]);
+            const element = list[index];
+            if (fn(element, index)) {
+                return element;
+            }
         }
+        return null;
     };
     /**
-     * @param {string} theme 
+     * @param {string} query
+     * @param {(Element, index: number) => void} fn
+     * @param {Element} node
+     * @return {void}
      */
-    const setTheme = (theme) => {
-        const root = document.documentElement;
-        const currentTheme = root.getAttribute(themeAttribute);
-        if (currentTheme !== theme) {
-            root.setAttribute(themeAttribute, theme);
-        }
-        localStorage.theme = theme;
-        forEach(themeInput, (input) => {
-            input.checked = input.value === theme;
-        });
-    };
-    /**
-     * @param {MediaQueryList} query 
-     */
-    const onChangeTheme = (query) => {
-        const dark = query.matches;
-        forEach(themeInput, (input) => {
-            input.checked = input.value === Dark ? dark : !dark;
-        });
-        setTheme(dark ? Dark : Light);
+    const forEach = (query, fn, node = document) => {
+        find(query, (element, index) => {
+            fn(element, index);
+        }, node);
     };
     const query = matchMedia('(prefers-color-scheme: dark)');
-    if (query.addEventListener) {
-        query.addEventListener('change', onChangeTheme);
-    } else if (query.addListener) {
-        query.addListener(onChangeTheme);
-    }
-    setTheme(localStorage.theme || (query.matches ? Dark : Light));
+    const isAuto = () => {
+        const autoInput = document.querySelector(themeAutoInput);
+        return !autoInput || autoInput && autoInput.checked;
+    };
+    const getSelectedTheme = () => find(themeInput, (input) => input.checked).value;
+    const getBrowserTheme = () => query.matches ? Dark : Light;
     /**
-     * @param {Event} event 
+     * @param {string} theme
+     * @param {boolean} auto
      */
-    const onChangeValue = (event) => setTheme(event.target.value);
-    forEach(themeInput, (input) => input.addEventListener('change', onChangeValue));
+    const applyTheme = (theme, auto) => {
+        forEach(themeInput, (input) => input.checked = input.value === theme);
+        forEach(themeAutoInput, (input) => input.checked = auto);
+        document.documentElement.setAttribute(themeAttribute, theme);
+        if (auto) {
+            localStorage.removeItem(storageKey);
+        } else {
+            localStorage.setItem(storageKey, theme);
+        }
+    };
+    /**
+     * @param {MediaQueryList} query
+     */
+    const onChangeBrowserTheme = () => {
+        const auto = isAuto();
+        if (auto) {
+            applyTheme(getBrowserTheme(), true);
+        }
+    };
+    if (query.addEventListener) {
+        query.addEventListener('change', onChangeBrowserTheme);
+    } else if (query.addListener) {
+        query.addListener(onChangeBrowserTheme);
+    }
+    /** @param {Event} event */
+    const onSelectTheme = (event) => applyTheme(event.target.value, false);
+    forEach(themeInput, (input) => input.addEventListener('change', onSelectTheme));
+    const onChangeAuto = () => {
+        if (isAuto()) {
+            applyTheme(getBrowserTheme(), true);
+        } else {
+            applyTheme(getSelectedTheme(), false);
+        }
+    };
+    forEach(themeAutoInput, (input) => input.addEventListener('change', onChangeAuto));
+    switch (localStorage.getItem(storageKey)) {
+        case Light:
+            applyTheme(Light, false);
+            break;
+        case Dark:
+            applyTheme(Dark, false);
+            break;
+        default:
+            applyTheme(getBrowserTheme(), true);
+    }
 }

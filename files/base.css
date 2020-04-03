@@ -1,5 +1,9 @@
 * {
     position: relative;
+    min-width: 0;
+    min-height: 0;
+    max-width: 100%;
+    max-height: 100%;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -211,11 +215,12 @@ svg {
 }
 
 input {
-    &[name=Theme] {
+    &[name^=HookTheme] {
         display: none;
         &+label {
             display: inline;
             text-decoration: underline;
+            cursor: pointer;
             &::before {
                 content: '☐';
                 display: inline-block;
@@ -229,4 +234,8 @@ input {
             }
         }
     }
+}
+
+button {
+    cursor: pointer;
 }

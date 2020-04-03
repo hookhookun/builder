@@ -56,8 +56,8 @@
         "@types/cheerio": "^0.22.17",
         "@types/cssnano": "^4.0.0",
         "@types/jsdom": "^12.2.4",
-        "@types/node": "^13.9.8",
-        "@types/react": "^16.9.31",
+        "@types/node": "^13.11.0",
+        "@types/react": "^16.9.32",
         "@types/react-dom": "^16.9.6",
         "@types/react-redux": "^7.1.7",
         "ava": "^3.5.2",
@@ -97,9 +97,18 @@
             },
             {
                 "files": [
-                    "src/domutil/**"
+                    "src/domutil/**",
+                    "files/**/*.js"
                 ],
                 "extends": ".eslintrc.dom.json"
+            },
+            {
+                "files": [
+                    "files/**/*.js"
+                ],
+                "rules": {
+                    "@typescript-eslint/explicit-function-return-type": "off"
+                }
             }
         ]
     }
