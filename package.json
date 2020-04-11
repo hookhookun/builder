@@ -25,7 +25,7 @@
     "files": [
         "lib",
         "files",
-        "@types",
+        "types",
         "tsconfig.base.json",
         ".eslintrc.*"
     ],
