@@ -6,6 +6,7 @@ import {removeSourceMapReference} from './removeSourceMapReference';
 import {watch} from './watch';
 import {glob} from './nodeutil/glob';
 import {hookunResolve} from './hookunResolve';
+import {remove} from './nodeutil/remove';
 
 export interface BuildOptions {
     src: string,
@@ -32,7 +33,10 @@ export const build = async (options: BuildOptions): Promise<void> => {
     if (!options.watch) {
         plugins.push(terser());
     }
-    const input = await glob(path.join(options.src, '**/*.html'));
+    const [input] = await Promise.all([
+        glob(path.join(options.src, '**/*.html')),
+        remove(options.dest),
+    ]);
     const inputOptions: rollup.InputOptions = {input, plugins};
     const format = 'system';
     if (options.watch) {
