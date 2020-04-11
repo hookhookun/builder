@@ -109,6 +109,14 @@
                 "rules": {
                     "@typescript-eslint/explicit-function-return-type": "off"
                 }
+            },
+            {
+                "files": [
+                    "src/util/debounce.ts"
+                ],
+                "rules": {
+                    "@typescript-eslint/no-explicit-any": "off"
+                }
             }
         ]
     }
