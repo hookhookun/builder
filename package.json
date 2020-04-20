@@ -112,7 +112,8 @@
             },
             {
                 "files": [
-                    "src/util/debounce.ts"
+                    "src/util/debounce.ts",
+                    "src/util/typeOf.ts"
                 ],
                 "rules": {
                     "@typescript-eslint/no-explicit-any": "off"
