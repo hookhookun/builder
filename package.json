@@ -44,7 +44,7 @@
         "eslint-plugin-react-hooks": "^4.0.0",
         "fast-glob": "^3.2.2",
         "magic-string": "^0.25.7",
-        "postcss": "^7.0.30",
+        "postcss": "^8.2.10",
         "postcss-nested": "^4.2.1",
         "postcss-selector-parser": "^6.0.2",
         "rollup": "^2.9.1",
